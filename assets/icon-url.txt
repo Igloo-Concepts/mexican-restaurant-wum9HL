@@ -1,0 +1,3 @@
+https://storage.googleapis.com/restaurant-app-generator.firebasestorage.app/generated/vSD1aw2JBURF6B8ER0ndxV7PxRr2/wum9HLpvLExj45/1776715363824-icon.png
+
+Replace assets/icon.png with the binary at this URL on EAS build.
