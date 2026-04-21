@@ -106,6 +106,36 @@ export interface EventItem {
   image?: string;
 }
 
+export interface ModulesConfig {
+  reservations?: {
+    enabled: boolean;
+    partySizeMax?: number;
+    depositCents?: number;
+  };
+  menuCms?: {
+    enabled: boolean;
+  };
+  catering?: {
+    enabled: boolean;
+    minGuests?: number;
+  };
+  pushCampaigns?: {
+    enabled: boolean;
+  };
+  customerAccounts?: {
+    enabled: boolean;
+  };
+  multiLocation?: {
+    enabled: boolean;
+  };
+  jobs?: {
+    enabled: boolean;
+  };
+  photoWall?: {
+    enabled: boolean;
+  };
+}
+
 export interface RestaurantConfig {
   name: string;
   tagline: string;
@@ -149,6 +179,7 @@ export interface RestaurantConfig {
   menu: { categories: string[]; items: MenuItem[] };
   gallery: string[];
   events: EventItem[];
+  modules?: ModulesConfig;
 }
 
 export const restaurantConfig: RestaurantConfig = {
@@ -185,7 +216,7 @@ export const restaurantConfig: RestaurantConfig = {
   hero: {
     image:
       "https://storage.googleapis.com/restaurant-app-generator.firebasestorage.app/generated/vSD1aw2JBURF6B8ER0ndxV7PxRr2/wum9HLpvLExj45/1776715453800-asset.png",
-    cta: "Order Now",
+    cta: "Reserve a Table",
     secondaryCta: "See the Menu",
     eyebrow: "🌶️ Street Food Vibes",
   },
@@ -284,7 +315,7 @@ export const restaurantConfig: RestaurantConfig = {
           "Chicken enchiladas, creamy tomatillo sauce, crema, queso fresco",
         price: "$18",
         category: "Platos Fuertes",
-        image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=1200&q=80&auto=format&fit=crop",
+        image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e701?w=1200&q=80&auto=format&fit=crop",
       },
       {
         id: "9",
@@ -371,4 +402,11 @@ export const restaurantConfig: RestaurantConfig = {
       image: "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=1200&q=80&auto=format&fit=crop",
     },
   ],
+  modules: {
+    reservations: {
+      enabled: true,
+      partySizeMax: 12,
+      depositCents: 0,
+    },
+  },
 };
