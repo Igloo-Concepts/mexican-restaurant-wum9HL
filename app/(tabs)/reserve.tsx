@@ -247,6 +247,9 @@ function WebDateTimeField({
         onChange={(event: any) => onChange(event?.target?.value ?? "")}
         style={{
           width: "100%",
+          maxWidth: "100%",
+          minWidth: 0,
+          boxSizing: "border-box",
           borderWidth: 1,
           borderStyle: "solid",
           borderColor: theme.muted,
