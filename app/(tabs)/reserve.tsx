@@ -5,7 +5,6 @@ import DateTimePicker, {
 import {
   Platform,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   View,
@@ -13,6 +12,7 @@ import {
 import { restaurantConfig } from "../../restaurant.config";
 import { ActionButton } from "../../components/ActionButton";
 import { SectionHeader } from "../../components/SectionHeader";
+import { SafeFormScroll } from "../../components/layout/SafeFormScroll";
 import { submitReservation } from "../../lib/platform";
 import { spacing, theme, typography, radiusFor } from "../../theme";
 
@@ -70,10 +70,7 @@ export default function ReserveScreen() {
   }
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: theme.background }}
-      contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxl }}
-    >
+    <SafeFormScroll>
       <SectionHeader title="Reserve a table" />
       <Text
         style={{
@@ -157,7 +154,7 @@ export default function ReserveScreen() {
         onPress={submitting ? undefined : send}
         style={{ marginTop: spacing.md }}
       />
-    </ScrollView>
+    </SafeFormScroll>
   );
 }
 
