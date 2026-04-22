@@ -129,6 +129,7 @@ export interface RestaurantConfig {
     hours: Array<{ day: string; hours: string }>;
   };
   menu: {
+    categories: string[];
     items: MenuItem[];
   };
   gallery: string[];
@@ -180,6 +181,7 @@ export const restaurantConfig: RestaurantConfig = {
   },
 
   menu: {
+    categories: ["Tacos", "Antojitos", "Platos Fuertes", "Bebidas", "Postres"],
     items: [
       {
         id: "1",
