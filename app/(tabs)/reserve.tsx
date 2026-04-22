@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import DateTimePicker, {
+  type DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { restaurantConfig } from "../../restaurant.config";
 import { ActionButton } from "../../components/ActionButton";
 import { SectionHeader } from "../../components/SectionHeader";
@@ -12,7 +22,9 @@ export default function ReserveScreen() {
 
   const [name, setName] = useState("");
   const [partySize, setPartySize] = useState("2");
-  const [date, setDate] = useState("");
+  const [dateInput, setDateInput] = useState("");
+  const [requestedAt, setRequestedAt] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -23,18 +35,17 @@ export default function ReserveScreen() {
     setError(null);
     setMessage(null);
     const size = Math.max(1, Math.min(maxParty, parseInt(partySize, 10) || 0));
-    if (!name.trim() || !date.trim()) {
+    const parsedDate = requestedAt?.getTime() ?? Date.parse(dateInput);
+    if (!name.trim() || !Number.isFinite(parsedDate)) {
       setError("Please fill in your name and a date.");
       return;
     }
-    const parsedDate = Date.parse(date);
-    const requestedFor = Number.isFinite(parsedDate) ? parsedDate : Date.now();
     setSubmitting(true);
     try {
       await submitReservation({
         name: name.trim(),
         partySize: size,
-        requestedFor,
+        requestedFor: parsedDate,
         phone: phone.trim() || undefined,
         notes: notes.trim() || undefined,
       });
@@ -43,7 +54,8 @@ export default function ReserveScreen() {
       );
       setName("");
       setPartySize("2");
-      setDate("");
+      setDateInput("");
+      setRequestedAt(null);
       setPhone("");
       setNotes("");
     } catch (e: any) {
@@ -81,12 +93,34 @@ export default function ReserveScreen() {
         placeholder="2"
         keyboardType="number-pad"
       />
-      <Field
-        label="Preferred date & time"
-        value={date}
-        onChange={setDate}
-        placeholder="2026-06-15 19:30"
-      />
+      {Platform.OS === "web" ? (
+        <Field
+          label="Preferred date & time"
+          value={dateInput}
+          onChange={setDateInput}
+          placeholder="2026-06-15 19:30"
+        />
+      ) : (
+        <DateField
+          label="Preferred date & time"
+          value={dateInput}
+          onPress={() => setShowDatePicker(true)}
+        />
+      )}
+      {showDatePicker && Platform.OS !== "web" ? (
+        <DateTimePicker
+          value={requestedAt ?? new Date()}
+          mode="datetime"
+          minimumDate={new Date()}
+          onChange={(event, selectedDate) => {
+            handleDateChange(event, selectedDate, (nextDate) => {
+              setRequestedAt(nextDate);
+              setDateInput(formatReservationDate(nextDate));
+            });
+            setShowDatePicker(false);
+          }}
+        />
+      ) : null}
       <Field
         label="Phone (optional)"
         value={phone}
@@ -115,6 +149,62 @@ export default function ReserveScreen() {
         style={{ marginTop: spacing.md }}
       />
     </ScrollView>
+  );
+}
+
+function handleDateChange(
+  event: DateTimePickerEvent,
+  selectedDate: Date | undefined,
+  onSelect: (value: Date) => void
+) {
+  if (event.type === "set" && selectedDate) {
+    onSelect(selectedDate);
+  }
+}
+
+function formatReservationDate(value: Date) {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  const hours = String(value.getHours()).padStart(2, "0");
+  const minutes = String(value.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+function DateField({
+  label,
+  value,
+  onPress,
+}: {
+  label: string;
+  value: string;
+  onPress: () => void;
+}) {
+  return (
+    <View style={{ marginBottom: spacing.md }}>
+      <Text
+        style={{ ...typography.caption, color: theme.muted, marginBottom: spacing.xs }}
+      >
+        {label}
+      </Text>
+      <Pressable
+        onPress={onPress}
+        style={{
+          borderWidth: 1,
+          borderColor: theme.muted,
+          borderRadius: radiusFor(theme.radius),
+          paddingHorizontal: spacing.md,
+          paddingVertical: spacing.sm,
+          backgroundColor: theme.surface,
+          minHeight: 48,
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ ...typography.body, color: value ? theme.text : theme.muted }}>
+          {value || "Tap to pick date & time"}
+        </Text>
+      </Pressable>
+    </View>
   );
 }
 
