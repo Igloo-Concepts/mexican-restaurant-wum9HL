@@ -94,11 +94,20 @@ export default function ReserveScreen() {
         keyboardType="number-pad"
       />
       {Platform.OS === "web" ? (
-        <Field
+        <WebDateTimeField
           label="Preferred date & time"
-          value={dateInput}
-          onChange={setDateInput}
-          placeholder="2026-06-15 19:30"
+          value={requestedAt ? formatDateTimeInputValue(requestedAt) : ""}
+          onChange={(nextValue) => {
+            const parsed = Date.parse(nextValue);
+            if (Number.isFinite(parsed)) {
+              const nextDate = new Date(parsed);
+              setRequestedAt(nextDate);
+              setDateInput(formatReservationDate(nextDate));
+              return;
+            }
+            setRequestedAt(null);
+            setDateInput("");
+          }}
         />
       ) : (
         <DateField
@@ -171,6 +180,15 @@ function formatReservationDate(value: Date) {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
+function formatDateTimeInputValue(value: Date) {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  const hours = String(value.getHours()).padStart(2, "0");
+  const minutes = String(value.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
 function DateField({
   label,
   value,
@@ -204,6 +222,44 @@ function DateField({
           {value || "Tap to pick date & time"}
         </Text>
       </Pressable>
+    </View>
+  );
+}
+
+function WebDateTimeField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const HtmlInput: any = "input";
+  return (
+    <View style={{ marginBottom: spacing.md }}>
+      <Text
+        style={{ ...typography.caption, color: theme.muted, marginBottom: spacing.xs }}
+      >
+        {label}
+      </Text>
+      <HtmlInput
+        type="datetime-local"
+        value={value}
+        min={formatDateTimeInputValue(new Date())}
+        onChange={(event: any) => onChange(event?.target?.value ?? "")}
+        style={{
+          width: "100%",
+          borderWidth: 1,
+          borderStyle: "solid",
+          borderColor: theme.muted,
+          borderRadius: radiusFor(theme.radius),
+          padding: 12,
+          color: theme.text,
+          backgroundColor: theme.surface,
+          fontSize: 16,
+        }}
+      />
     </View>
   );
 }
