@@ -361,5 +361,8 @@ export const restaurantConfig: RestaurantConfig = {
       enabled: true,
       partySizeMax: 12,
     },
+    menuCms: {
+      enabled: true,
+    },
   },
 };
