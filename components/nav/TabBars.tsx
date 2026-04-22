@@ -10,7 +10,7 @@ import { layout, radiusFor, spacing, theme } from "../../theme";
 const GLYPHS: Record<string, string> = {
   index: "⌂",
   menu: "≡",
-  reserve: "📖",
+  reserve: "⊞",
   gallery: "◳",
   events: "★",
   location: "◉",
