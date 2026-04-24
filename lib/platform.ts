@@ -115,8 +115,8 @@ export interface ReservationHoursApiResponse {
     string,
     Array<{ open: string; close: string }>
   >;
-  /** Step between bookable time slots inside each session. */
-  slotIntervalMinutes?: 15 | 30 | 60;
+  /** Step between bookable time slots inside each session (15, 30, or 60). */
+  slotIntervalMinutes?: number;
 }
 
 export async function fetchReservationHours(): Promise<ReservationHoursApiResponse | null> {
