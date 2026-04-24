@@ -11,7 +11,16 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LogBox } from "react-native";
 import { restaurantConfig, type ModulesConfig, type TenantConfig } from "../restaurant.config";
+
+// Silence a handful of non-actionable deprecation warnings that Expo SDK 54
+// + React Navigation 7 still emit but which we've already migrated away from
+// in the template itself. They come from third-party dependencies and only
+// add visual noise to the Snack preview — they do not signal broken code.
+LogBox.ignoreLogs([
+  "SafeAreaView has been deprecated",
+]);
 
 const DEFAULT_API_BASE =
   (restaurantConfig.tenant?.apiBase ?? "").replace(/\/$/, "") || null;

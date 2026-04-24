@@ -267,20 +267,65 @@ export default function ReserveScreen() {
   );
 }
 
-function formatPickerDayLabel(d: Date): string {
-  return new Intl.DateTimeFormat("en-GB", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  }).format(d);
-}
-
 function formatPickerTimeLabel(slot: Date): string {
   return new Intl.DateTimeFormat("en-GB", {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
   }).format(slot);
+}
+
+function formatMonthYear(d: Date): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    month: "long",
+    year: "numeric",
+  }).format(d);
+}
+
+function formatSelectedDayLabel(d: Date): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(d);
+}
+
+const WEEKDAY_HEADINGS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function startOfMonth(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0, 0);
+}
+
+function addMonths(d: Date, n: number): Date {
+  return new Date(d.getFullYear(), d.getMonth() + n, 1, 0, 0, 0, 0);
+}
+
+function sameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+/**
+ * Build the 6-row x 7-col grid of dates for the given month, padding with
+ * the adjacent month's days so the calendar always shows a full 6-week
+ * block. Grid starts on Monday to match the headings above.
+ */
+function buildMonthGrid(month: Date): Date[] {
+  const first = startOfMonth(month);
+  // Mon=0 … Sun=6. JS: getDay() → Sun=0 … Sat=6 → we shift to Mon-first.
+  const firstWeekdayMondayFirst = (first.getDay() + 6) % 7;
+  const gridStart = new Date(first);
+  gridStart.setDate(first.getDate() - firstWeekdayMondayFirst);
+  const cells: Date[] = [];
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(gridStart);
+    d.setDate(gridStart.getDate() + i);
+    cells.push(d);
+  }
+  return cells;
 }
 
 function OpeningHoursInlinePicker({
@@ -294,25 +339,52 @@ function OpeningHoursInlinePicker({
   value: Date | null;
   onSelect: (d: Date) => void;
 }) {
-  const [dayStarts, setDayStarts] = useState<Date[]>([]);
+  const today = useMemo(() => startOfLocalDay(new Date()), []);
+
+  // Pre-compute every bookable calendar day for the next ~120 days so the
+  // calendar can enable/disable cells quickly as the user pages through
+  // months. We compare by timestamp of local-midnight for exact matching.
+  const bookableDayKeys = useMemo(() => {
+    const now = new Date();
+    const days = upcomingBookableDayStarts(weeklyHours, 120, now);
+    return new Set(days.map((d) => d.getTime()));
+  }, [weeklyHours]);
+
+  const firstBookable = useMemo(() => {
+    const now = new Date();
+    const days = upcomingBookableDayStarts(weeklyHours, 120, now);
+    return days[0] ?? null;
+  }, [weeklyHours]);
+
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [viewMonth, setViewMonth] = useState<Date>(() =>
+    startOfMonth(value ?? firstBookable ?? today)
+  );
 
   useEffect(() => {
-    const now = new Date();
-    const days = upcomingBookableDayStarts(weeklyHours, 28, now);
-    setDayStarts(days);
-    if (!days.length) {
+    if (bookableDayKeys.size === 0) {
       setSelectedDay(null);
       return;
     }
-    if (value) {
-      const cur = startOfLocalDay(value);
-      const match = days.find((d) => d.getTime() === cur.getTime());
-      setSelectedDay(match ?? days[0]!);
-    } else {
-      setSelectedDay(days[0]!);
+    const candidate = value ? startOfLocalDay(value) : null;
+    if (candidate && bookableDayKeys.has(candidate.getTime())) {
+      setSelectedDay(candidate);
+      setViewMonth((m) =>
+        m.getTime() === startOfMonth(candidate).getTime()
+          ? m
+          : startOfMonth(candidate)
+      );
+      return;
     }
-  }, [weeklyHours, value]);
+    if (firstBookable) {
+      setSelectedDay(firstBookable);
+      setViewMonth((m) =>
+        m.getTime() === startOfMonth(firstBookable).getTime()
+          ? m
+          : startOfMonth(firstBookable)
+      );
+    }
+  }, [bookableDayKeys, value, firstBookable]);
 
   const slots = selectedDay
     ? generateBookableSlotDates(selectedDay, weeklyHours, {
@@ -320,6 +392,8 @@ function OpeningHoursInlinePicker({
         stepMinutes,
       })
     : [];
+
+  const cells = useMemo(() => buildMonthGrid(viewMonth), [viewMonth]);
 
   return (
     <View
@@ -341,111 +415,211 @@ function OpeningHoursInlinePicker({
       >
         Preferred date & time
       </Text>
-      <Text
+
+      {/* Month navigator */}
+      <View
         style={{
-          ...typography.body,
-          fontWeight: "600",
-          color: theme.text,
-          marginBottom: spacing.xs,
-        }}
-      >
-        Day
-      </Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingVertical: spacing.xs,
           flexDirection: "row",
           alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: spacing.sm,
         }}
       >
-        {dayStarts.map((d) => {
-          const active =
-            selectedDay != null && d.getTime() === selectedDay.getTime();
-          return (
-            <Pressable
-              key={d.getTime()}
-              onPress={() => setSelectedDay(d)}
-              style={{
-                marginRight: spacing.sm,
-                paddingHorizontal: spacing.md,
-                paddingVertical: spacing.sm,
-                borderRadius: radiusFor(theme.radius),
-                borderWidth: 1,
-                borderColor: active ? theme.accent : theme.muted,
-                backgroundColor: active ? `${theme.accent}25` : "transparent",
-              }}
-            >
-              <Text
-                style={{
-                  ...typography.caption,
-                  color: active ? theme.accent : theme.text,
-                  fontWeight: active ? "600" : "400",
-                }}
-              >
-                {formatPickerDayLabel(d)}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-
-      <Text
-        style={{
-          ...typography.body,
-          fontWeight: "600",
-          color: theme.text,
-          marginTop: spacing.sm,
-          marginBottom: spacing.xs,
-        }}
-      >
-        Time
-      </Text>
-      {dayStarts.length === 0 ? (
-        <Text style={{ ...typography.caption, color: theme.muted }}>
-          No seating hours in the next few weeks.
-        </Text>
-      ) : slots.length === 0 ? (
-        <Text style={{ ...typography.caption, color: theme.muted }}>
-          No more times that day — choose another day above.
-        </Text>
-      ) : (
-        <ScrollView
-          style={{ maxHeight: 260 }}
-          contentContainerStyle={{
-            flexDirection: "row",
-            flexWrap: "wrap",
-            paddingTop: spacing.xs,
+        <CalendarNavButton
+          label="<"
+          onPress={() => setViewMonth((m) => addMonths(m, -1))}
+        />
+        <Text
+          style={{
+            ...typography.body,
+            fontWeight: "700",
+            color: theme.text,
           }}
         >
-          {slots.map((slot) => {
-            const selected =
-              value != null && slot.getTime() === value.getTime();
+          {formatMonthYear(viewMonth)}
+        </Text>
+        <CalendarNavButton
+          label=">"
+          onPress={() => setViewMonth((m) => addMonths(m, 1))}
+        />
+      </View>
+
+      {/* Weekday headings */}
+      <View style={{ flexDirection: "row", marginBottom: spacing.xs }}>
+        {WEEKDAY_HEADINGS.map((w) => (
+          <View key={w} style={{ flex: 1, alignItems: "center" }}>
+            <Text
+              style={{
+                ...typography.caption,
+                color: theme.muted,
+                fontWeight: "600",
+                letterSpacing: 0.5,
+              }}
+            >
+              {w}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      {/* 6-row day grid */}
+      {[0, 1, 2, 3, 4, 5].map((rowIdx) => (
+        <View
+          key={rowIdx}
+          style={{ flexDirection: "row", marginBottom: spacing.xs }}
+        >
+          {cells.slice(rowIdx * 7, rowIdx * 7 + 7).map((cell) => {
+            const inViewMonth = cell.getMonth() === viewMonth.getMonth();
+            const isToday = sameDay(cell, today);
+            const isSelected =
+              selectedDay != null && sameDay(cell, selectedDay);
+            const isBookable =
+              bookableDayKeys.has(cell.getTime()) &&
+              cell.getTime() >= today.getTime();
+
+            let textColor: string = theme.text;
+            if (!inViewMonth) textColor = theme.muted;
+            if (!isBookable) textColor = theme.muted;
+            if (isSelected) textColor = theme.accent;
+
             return (
               <Pressable
-                key={slot.getTime()}
-                onPress={() => onSelect(slot)}
+                key={cell.getTime()}
+                disabled={!isBookable}
+                onPress={() => {
+                  setSelectedDay(cell);
+                }}
                 style={{
-                  marginRight: spacing.sm,
-                  marginBottom: spacing.sm,
-                  paddingHorizontal: spacing.md,
-                  paddingVertical: spacing.sm,
+                  flex: 1,
+                  aspectRatio: 1,
+                  marginHorizontal: 2,
+                  alignItems: "center",
+                  justifyContent: "center",
                   borderRadius: radiusFor(theme.radius),
-                  borderWidth: 1,
-                  borderColor: selected ? theme.accent : theme.muted,
-                  backgroundColor: selected ? `${theme.accent}20` : theme.background,
+                  borderWidth: isSelected ? 1 : 0,
+                  borderColor: isSelected ? theme.accent : "transparent",
+                  backgroundColor: isSelected
+                    ? `${theme.accent}25`
+                    : isToday && isBookable
+                      ? `${theme.accent}10`
+                      : "transparent",
+                  opacity: isBookable ? 1 : 0.35,
                 }}
               >
-                <Text style={{ ...typography.body, color: theme.text }}>
-                  {formatPickerTimeLabel(slot)}
+                <Text
+                  style={{
+                    ...typography.body,
+                    color: textColor,
+                    fontWeight: isSelected || isToday ? "700" : "400",
+                  }}
+                >
+                  {cell.getDate()}
                 </Text>
               </Pressable>
             );
           })}
-        </ScrollView>
-      )}
+        </View>
+      ))}
+
+      {/* Time slots for selected day */}
+      <View style={{ marginTop: spacing.sm }}>
+        <Text
+          style={{
+            ...typography.body,
+            fontWeight: "600",
+            color: theme.text,
+            marginBottom: spacing.xs,
+          }}
+        >
+          {selectedDay
+            ? `Times on ${formatSelectedDayLabel(selectedDay)}`
+            : "Time"}
+        </Text>
+        {bookableDayKeys.size === 0 ? (
+          <Text style={{ ...typography.caption, color: theme.muted }}>
+            No seating hours in the next few weeks.
+          </Text>
+        ) : !selectedDay ? (
+          <Text style={{ ...typography.caption, color: theme.muted }}>
+            Pick a highlighted day above.
+          </Text>
+        ) : slots.length === 0 ? (
+          <Text style={{ ...typography.caption, color: theme.muted }}>
+            No more times that day — pick another date.
+          </Text>
+        ) : (
+          <ScrollView
+            style={{ maxHeight: 260 }}
+            contentContainerStyle={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              paddingTop: spacing.xs,
+            }}
+          >
+            {slots.map((slot) => {
+              const selected =
+                value != null && slot.getTime() === value.getTime();
+              return (
+                <Pressable
+                  key={slot.getTime()}
+                  onPress={() => onSelect(slot)}
+                  style={{
+                    marginRight: spacing.sm,
+                    marginBottom: spacing.sm,
+                    paddingHorizontal: spacing.md,
+                    paddingVertical: spacing.sm,
+                    borderRadius: radiusFor(theme.radius),
+                    borderWidth: 1,
+                    borderColor: selected ? theme.accent : theme.muted,
+                    backgroundColor: selected
+                      ? `${theme.accent}20`
+                      : theme.background,
+                  }}
+                >
+                  <Text style={{ ...typography.body, color: theme.text }}>
+                    {formatPickerTimeLabel(slot)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        )}
+      </View>
     </View>
+  );
+}
+
+function CalendarNavButton({
+  label,
+  onPress,
+}: {
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={8}
+      style={{
+        width: 36,
+        height: 36,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: radiusFor(theme.radius),
+        borderWidth: 1,
+        borderColor: theme.muted,
+      }}
+    >
+      <Text
+        style={{
+          ...typography.body,
+          color: theme.text,
+          fontWeight: "700",
+        }}
+      >
+        {label}
+      </Text>
+    </Pressable>
   );
 }
 
