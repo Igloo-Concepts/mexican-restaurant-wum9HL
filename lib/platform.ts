@@ -109,6 +109,35 @@ export async function submitReservation(input: ReservationRequest) {
   );
 }
 
+/** Weekly opening sessions from Manage → Reservations (GET `reservation-hours`). */
+export interface ReservationHoursApiResponse {
+  weeklyHours: Record<
+    string,
+    Array<{ open: string; close: string }>
+  >;
+  /** Step between bookable time slots inside each session. */
+  slotIntervalMinutes?: 15 | 30 | 60;
+}
+
+export async function fetchReservationHours(): Promise<ReservationHoursApiResponse | null> {
+  // Fetch whenever tenant credentials exist — not `modules.reservations.enabled`,
+  // which is often stale in Snack while the server already has reservations + hours.
+  if (!getTenantConfig()) return null;
+  try {
+    return await tenantFetch<ReservationHoursApiResponse>("reservation-hours", {
+      method: "GET",
+    });
+  } catch {
+    return null;
+  }
+}
+
+export function useReservationHours() {
+  return useFetched<ReservationHoursApiResponse>(
+    getTenantConfig() ? "reservation-hours" : null
+  );
+}
+
 export interface LeadRequest {
   kind: "catering" | "jobs";
   name: string;
