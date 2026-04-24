@@ -29,22 +29,17 @@ import {
 } from "../../lib/reservation-time-constraints";
 import { spacing, theme, typography, radiusFor } from "../../theme";
 
-type SlotIntervalMinutes = 15 | 30 | 60;
-const DEFAULT_SLOT_INTERVAL: SlotIntervalMinutes = 15;
-const ALLOWED_SLOT_INTERVALS: readonly SlotIntervalMinutes[] = [
-  15, 30, 60,
-] as const;
+const DEFAULT_SLOT_INTERVAL = 15;
+const ALLOWED_SLOT_INTERVALS: readonly number[] = [15, 30, 60];
 
-function coerceSlotInterval(value: unknown): SlotIntervalMinutes {
+function coerceSlotInterval(value: unknown): number {
   const n =
     typeof value === "number"
       ? value
       : typeof value === "string"
         ? Number(value)
         : NaN;
-  return (ALLOWED_SLOT_INTERVALS as readonly number[]).includes(n)
-    ? (n as SlotIntervalMinutes)
-    : DEFAULT_SLOT_INTERVAL;
+  return ALLOWED_SLOT_INTERVALS.includes(n) ? n : DEFAULT_SLOT_INTERVAL;
 }
 
 export default function ReserveScreen() {
@@ -89,7 +84,7 @@ export default function ReserveScreen() {
     [weeklyHoursFromApi, weeklyHoursEmbedded]
   );
 
-  const slotIntervalMinutes: SlotIntervalMinutes = useMemo(() => {
+  const slotIntervalMinutes = useMemo(() => {
     if (hoursData?.slotIntervalMinutes !== undefined) {
       return coerceSlotInterval(hoursData.slotIntervalMinutes);
     }
@@ -295,7 +290,7 @@ function OpeningHoursInlinePicker({
   onSelect,
 }: {
   weeklyHours: WeeklyHoursMap;
-  stepMinutes: SlotIntervalMinutes;
+  stepMinutes: number;
   value: Date | null;
   onSelect: (d: Date) => void;
 }) {
