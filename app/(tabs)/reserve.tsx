@@ -17,14 +17,15 @@ import {
   useReservationHours,
 } from "../../lib/platform";
 import {
-  clampToWeeklyHours,
   generateBookableSlotDates,
   hasConfiguredWeeklyHours,
+  mergeBookingOverridesPreferApi,
   mergeWeeklyHoursPreferApi,
-  nextAvailableSlot,
+  normalizeBookingOverridesFromApi,
   normalizeWeeklyHoursFromApi,
   startOfLocalDay,
   upcomingBookableDayStarts,
+  type BookingOverride,
   type WeeklyHoursMap,
 } from "../../lib/reservation-time-constraints";
 import { spacing, theme, typography, radiusFor } from "../../theme";
@@ -71,6 +72,7 @@ export default function ReserveScreen() {
     | {
         weeklyHours?: Record<string, unknown>;
         slotIntervalMinutes?: unknown;
+        bookingOverrides?: unknown;
       }
     | undefined;
 
@@ -82,6 +84,25 @@ export default function ReserveScreen() {
   const weeklyHoursMerged = useMemo(
     () => mergeWeeklyHoursPreferApi(weeklyHoursFromApi, weeklyHoursEmbedded),
     [weeklyHoursFromApi, weeklyHoursEmbedded]
+  );
+
+  const bookingOverridesFromApi = useMemo(
+    () => normalizeBookingOverridesFromApi(hoursData?.bookingOverrides),
+    [hoursData]
+  );
+
+  const bookingOverridesEmbedded = useMemo(
+    () => normalizeBookingOverridesFromApi(embeddedReservations?.bookingOverrides),
+    [embeddedReservations]
+  );
+
+  const bookingOverrides = useMemo(
+    () =>
+      mergeBookingOverridesPreferApi(
+        bookingOverridesFromApi,
+        bookingOverridesEmbedded
+      ),
+    [bookingOverridesFromApi, bookingOverridesEmbedded]
   );
 
   const slotIntervalMinutes = useMemo(() => {
@@ -96,6 +117,37 @@ export default function ReserveScreen() {
 
   const hoursConfigured = hasConfiguredWeeklyHours(weeklyHoursMerged);
 
+  const nextBookableSlot = useCallback(
+    (from: Date): Date | null => {
+      const start = startOfLocalDay(from);
+      for (let i = 0; i < 120; i++) {
+        const day = new Date(start);
+        day.setDate(start.getDate() + i);
+        const slots = generateBookableSlotDates(day, weeklyHoursMerged, {
+          notBefore: from,
+          stepMinutes: slotIntervalMinutes,
+          bookingOverrides,
+        });
+        if (slots.length > 0) return slots[0]!;
+      }
+      return null;
+    },
+    [weeklyHoursMerged, slotIntervalMinutes, bookingOverrides]
+  );
+
+  const isSlotSelectable = useCallback(
+    (value: Date): boolean => {
+      const cal = startOfLocalDay(value);
+      const slots = generateBookableSlotDates(cal, weeklyHoursMerged, {
+        notBefore: new Date(),
+        stepMinutes: slotIntervalMinutes,
+        bookingOverrides,
+      });
+      return slots.some((slot) => slot.getTime() === value.getTime());
+    },
+    [weeklyHoursMerged, slotIntervalMinutes, bookingOverrides]
+  );
+
   const [name, setName] = useState("");
   const [partySize, setPartySize] = useState("2");
   const [requestedAt, setRequestedAt] = useState<Date | null>(null);
@@ -109,10 +161,10 @@ export default function ReserveScreen() {
     if (hoursLoading) return;
     if (!hoursConfigured) return;
     setRequestedAt((prev: Date | null) => {
-      const base = prev ?? nextAvailableSlot(new Date(), weeklyHoursMerged);
-      return clampToWeeklyHours(base, weeklyHoursMerged);
+      if (prev && isSlotSelectable(prev)) return prev;
+      return nextBookableSlot(new Date());
     });
-  }, [hoursLoading, hoursConfigured, weeklyHoursMerged]);
+  }, [hoursLoading, hoursConfigured, nextBookableSlot, isSlotSelectable]);
 
   async function send() {
     setError(null);
@@ -132,13 +184,22 @@ export default function ReserveScreen() {
       setError("Please choose a time.");
       return;
     }
-    const clamped = clampToWeeklyHours(requestedAt, weeklyHoursMerged);
+    if (!isSlotSelectable(requestedAt)) {
+      const next = nextBookableSlot(new Date());
+      setRequestedAt(next);
+      setError(
+        next
+          ? "That time is no longer available. Please choose another slot."
+          : "No bookable times are currently available."
+      );
+      return;
+    }
     setSubmitting(true);
     try {
       await submitReservation({
         name: name.trim(),
         partySize: size,
-        requestedFor: clamped.getTime(),
+        requestedFor: requestedAt.getTime(),
         phone: phone.trim() || undefined,
         notes: notes.trim() || undefined,
       });
@@ -226,6 +287,7 @@ export default function ReserveScreen() {
         <OpeningHoursInlinePicker
           weeklyHours={weeklyHoursMerged}
           stepMinutes={slotIntervalMinutes}
+          bookingOverrides={bookingOverrides}
           value={requestedAt}
           onSelect={(slot) => setRequestedAt(slot)}
         />
@@ -331,11 +393,13 @@ function buildMonthGrid(month: Date): Date[] {
 function OpeningHoursInlinePicker({
   weeklyHours,
   stepMinutes,
+  bookingOverrides,
   value,
   onSelect,
 }: {
   weeklyHours: WeeklyHoursMap;
   stepMinutes: number;
+  bookingOverrides: BookingOverride[];
   value: Date | null;
   onSelect: (d: Date) => void;
 }) {
@@ -346,15 +410,21 @@ function OpeningHoursInlinePicker({
   // months. We compare by timestamp of local-midnight for exact matching.
   const bookableDayKeys = useMemo(() => {
     const now = new Date();
-    const days = upcomingBookableDayStarts(weeklyHours, 120, now);
+    const days = upcomingBookableDayStarts(weeklyHours, 120, now, {
+      stepMinutes,
+      bookingOverrides,
+    });
     return new Set(days.map((d) => d.getTime()));
-  }, [weeklyHours]);
+  }, [weeklyHours, stepMinutes, bookingOverrides]);
 
   const firstBookable = useMemo(() => {
     const now = new Date();
-    const days = upcomingBookableDayStarts(weeklyHours, 120, now);
+    const days = upcomingBookableDayStarts(weeklyHours, 120, now, {
+      stepMinutes,
+      bookingOverrides,
+    });
     return days[0] ?? null;
-  }, [weeklyHours]);
+  }, [weeklyHours, stepMinutes, bookingOverrides]);
 
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [viewMonth, setViewMonth] = useState<Date>(() =>
@@ -390,6 +460,7 @@ function OpeningHoursInlinePicker({
     ? generateBookableSlotDates(selectedDay, weeklyHours, {
         notBefore: new Date(),
         stepMinutes,
+        bookingOverrides,
       })
     : [];
 

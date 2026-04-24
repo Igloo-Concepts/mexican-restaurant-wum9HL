@@ -126,6 +126,12 @@ export interface ReservationHoursApiResponse {
   >;
   /** Step between bookable time slots inside each session (15, 30, or 60). */
   slotIntervalMinutes?: number;
+  /** Optional date-specific closures from admin (full day or blocked windows). */
+  bookingOverrides?: Array<{
+    date: string;
+    closedAllDay?: boolean;
+    closedWindows?: Array<{ open: string; close: string }>;
+  }>;
 }
 
 export async function fetchReservationHours(): Promise<ReservationHoursApiResponse | null> {

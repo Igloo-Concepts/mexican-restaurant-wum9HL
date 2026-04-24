@@ -4,6 +4,14 @@
  */
 
 export type OpeningSession = { open: string; close: string };
+export type BookingOverride = {
+  /** Local calendar date in YYYY-MM-DD format. */
+  date: string;
+  /** If true, no bookings are allowed on this date. */
+  closedAllDay?: boolean;
+  /** Optional blocked windows on this date. */
+  closedWindows?: OpeningSession[];
+};
 
 const WEEKDAY_ORDER = [
   "sunday",
@@ -18,6 +26,7 @@ const WEEKDAY_ORDER = [
 export type WeekdayKey = (typeof WEEKDAY_ORDER)[number];
 
 export type WeeklyHoursMap = Partial<Record<WeekdayKey, OpeningSession[]>>;
+const ISO_LOCAL_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 function weekdayKey(d: Date): WeekdayKey {
   return WEEKDAY_ORDER[d.getDay()];
@@ -59,6 +68,24 @@ function sortedSessions(day: OpeningSession[] | undefined): OpeningSession[] {
   });
 }
 
+function normalizeSessionsArray(raw: unknown): OpeningSession[] {
+  if (!Array.isArray(raw)) return [];
+  const sessions: OpeningSession[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const o = item as Record<string, unknown>;
+    const openRaw =
+      o.open ?? o.Open ?? o.OPEN ?? o.start ?? o.Start ?? o.from ?? o.From;
+    const closeRaw =
+      o.close ?? o.Close ?? o.CLOSE ?? o.end ?? o.End ?? o.to ?? o.To;
+    const open = String(openRaw ?? "").trim();
+    const close = String(closeRaw ?? "").trim();
+    if (parseHm(open) === null || parseHm(close) === null) continue;
+    sessions.push({ open, close });
+  }
+  return sessions;
+}
+
 /** Valid same-day window: open < close (minutes). */
 function normalizedSession(s: OpeningSession): { open: number; close: number } | null {
   const o = parseHm(s.open);
@@ -92,23 +119,41 @@ export function normalizeWeeklyHoursFromApi(
   for (const [rawKey, val] of Object.entries(raw)) {
     const key = rawKey.toLowerCase().trim() as WeekdayKey;
     if (!WEEKDAY_ORDER.includes(key)) continue;
-    if (!Array.isArray(val)) continue;
-    const sessions: OpeningSession[] = [];
-    for (const item of val) {
-      if (!item || typeof item !== "object") continue;
-      const o = item as Record<string, unknown>;
-      const openRaw =
-        o.open ?? o.Open ?? o.OPEN ?? o.start ?? o.Start ?? o.from ?? o.From;
-      const closeRaw =
-        o.close ?? o.Close ?? o.CLOSE ?? o.end ?? o.End ?? o.to ?? o.To;
-      const open = String(openRaw ?? "").trim();
-      const close = String(closeRaw ?? "").trim();
-      if (parseHm(open) === null || parseHm(close) === null) continue;
-      sessions.push({ open, close });
-    }
+    const sessions = normalizeSessionsArray(val);
     if (sessions.length) out[key] = sessions;
   }
   return out as WeeklyHoursMap;
+}
+
+/** Normalise booking overrides from API/config into predictable shapes. */
+export function normalizeBookingOverridesFromApi(raw: unknown): BookingOverride[] {
+  if (!Array.isArray(raw)) return [];
+  const out: BookingOverride[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const rec = item as Record<string, unknown>;
+    const date = String(rec.date ?? "").trim();
+    if (!ISO_LOCAL_DATE.test(date)) continue;
+    const closedAllDay = rec.closedAllDay === true;
+    const closedWindows = closedAllDay ? [] : normalizeSessionsArray(rec.closedWindows);
+    if (!closedAllDay && closedWindows.length === 0) continue;
+    out.push({
+      date,
+      closedAllDay,
+      closedWindows,
+    });
+  }
+  const deduped = new Map<string, BookingOverride>();
+  for (const item of out) deduped.set(item.date, item);
+  return [...deduped.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/** Prefer server overrides; fall back to embedded config if server has none. */
+export function mergeBookingOverridesPreferApi(
+  fromApi: BookingOverride[],
+  embedded: BookingOverride[]
+): BookingOverride[] {
+  return fromApi.length > 0 ? fromApi : embedded;
 }
 
 /**
@@ -118,7 +163,11 @@ export function normalizeWeeklyHoursFromApi(
 export function generateBookableSlotDates(
   calDay: Date,
   wh: WeeklyHoursMap,
-  opts?: { stepMinutes?: number; notBefore?: Date }
+  opts?: {
+    stepMinutes?: number;
+    notBefore?: Date;
+    bookingOverrides?: BookingOverride[];
+  }
 ): Date[] {
   const step = Math.max(5, Math.min(60, opts?.stepMinutes ?? 15));
   const notBefore = opts?.notBefore;
@@ -129,6 +178,7 @@ export function generateBookableSlotDates(
     for (let m = sess.open; m <= sess.close; m += step) {
       const dt = setDateToTotalMinutes(cal, m);
       if (notBefore && dt.getTime() < notBefore.getTime()) continue;
+      if (isSlotBlockedByOverrides(dt, opts?.bookingOverrides)) continue;
       slots.push(dt);
     }
   }
@@ -139,14 +189,19 @@ export function generateBookableSlotDates(
 export function upcomingBookableDayStarts(
   wh: WeeklyHoursMap,
   maxScanDays: number,
-  notBefore: Date
+  notBefore: Date,
+  opts?: { stepMinutes?: number; bookingOverrides?: BookingOverride[] }
 ): Date[] {
   const out: Date[] = [];
   const start = startOfLocalDay(notBefore);
   for (let i = 0; i < maxScanDays; i++) {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
-    const slots = generateBookableSlotDates(d, wh, { notBefore });
+    const slots = generateBookableSlotDates(d, wh, {
+      notBefore,
+      stepMinutes: opts?.stepMinutes,
+      bookingOverrides: opts?.bookingOverrides,
+    });
     if (slots.length > 0) out.push(startOfLocalDay(d));
   }
   return out;
@@ -248,4 +303,40 @@ export function clampToWeeklyHours(value: Date, wh: WeeklyHoursMap): Date {
   const nextCal = new Date(cal.getTime());
   nextCal.setDate(nextCal.getDate() + 1);
   return nextAvailableSlot(nextCal, wh);
+}
+
+function dateKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function normalizedOverrideSession(
+  s: OpeningSession
+): { open: number; close: number } | null {
+  return normalizedSession(s);
+}
+
+/**
+ * True when a slot lands in a fully-closed day or a blocked window for that
+ * date.
+ */
+export function isSlotBlockedByOverrides(
+  slot: Date,
+  overrides: BookingOverride[] | undefined
+): boolean {
+  if (!overrides || overrides.length === 0) return false;
+  const key = dateKey(slot);
+  const hit = overrides.find((o) => o.date === key);
+  if (!hit) return false;
+  if (hit.closedAllDay) return true;
+  const minute = slot.getHours() * 60 + slot.getMinutes();
+  const windows = hit.closedWindows ?? [];
+  for (const w of windows) {
+    const parsed = normalizedOverrideSession(w);
+    if (!parsed) continue;
+    if (minute >= parsed.open && minute <= parsed.close) return true;
+  }
+  return false;
 }
