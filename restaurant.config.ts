@@ -92,6 +92,7 @@ export interface LayoutConfig {
   cornerStyle?: CornerStyle;
   decor?: DecorStyle;
   mood?: Mood;
+  tabBarHiddenRoutes?: string[];
 }
 
 export interface MenuItem {
@@ -226,336 +227,220 @@ export interface RestaurantConfig {
 }
 
 export const restaurantConfig: RestaurantConfig = {
-  "name": "mexican restaurant",
-  "tagline": "build a fun funky mexican restaurant",
-  "about": "build a fun funky mexican restaurant",
-  "preset": "modern",
-  "theme": {
-    "primary": "#1f1d1a",
-    "secondary": "#c69a52",
-    "background": "#fbf8f3",
-    "surface": "#ffffff",
-    "text": "#1f1d1a",
-    "muted": "#7a7268",
-    "accent": "#b45f43",
-    "fontHeading": "System",
-    "fontBody": "System",
-    "radius": 16
+  name: "La Chispa",
+  tagline: "Vibrant Mexican Street Food & Cocktails",
+  about: "A fun, funky taqueria bringing the bold flavors and electric energy of Mexico City street food to Austin. Late-night tacos, craft margaritas, and a party atmosphere.",
+  preset: "modern",
+  theme: {
+    primary: "#FF1493",
+    secondary: "#39FF14",
+    background: "#1A0A2E",
+    surface: "#2D1B4E",
+    text: "#FFFFFF",
+    muted: "#B8A9D4",
+    accent: "#FFD700",
+    fontHeading: "Bebas Neue",
+    fontBody: "Inter",
+    radius: 0,
   },
-  "layout": {
-    "nav": "bottomTabs",
-    "hero": "fullBleed",
-    "menu": "chips",
-    "gallery": "grid",
-    "events": "cards",
-    "location": "standard",
-    "typography": "modernSans",
-    "density": "comfortable",
-    "cornerStyle": "rounded",
-    "decor": "dividers",
-    "mood": "warm"
+  layout: {
+    nav: "pillTabs",
+    hero: "marquee",
+    menu: "grid",
+    gallery: "masonry",
+    events: "timeline",
+    location: "hero",
+    typography: "boldCondensed",
+    density: "compact",
+    cornerStyle: "sharp",
+    decor: "underline",
+    mood: "bright",
+    tabBarHiddenRoutes: ["gallery", "events", "catering"],
   },
-  "hero": {
-    "image": "https://images.unsplash.com/photo-1565299585323-381d00140451?w=1200&q=80",
-    "cta": "Reserve a table",
-    "secondaryCta": "View the menu",
-    "eyebrow": "Hecho a mano"
+  hero: {
+    image: "https://storage.googleapis.com/imagenai-api-public-us-central1/c3a0e1e0-0e1f-4f3f-8f3f-0e1f4f3f8f3f/0.png",
+    cta: "Reserve a Table",
+    secondaryCta: "View Menu",
+    eyebrow: "¡BIENVENIDOS!",
   },
-  "contact": {
-    "address": "18 Calle de Republica, Roma Norte, CDMX",
-    "phone": "+52 55 1234 5678",
-    "email": "hola@example.com",
-    "mapsUrl": "https://maps.google.com/?q=Roma+Norte+Mexico+City",
-    "hours": [
-      {
-        "day": "Mon-Thu",
-        "hours": "8:00 - 22:00"
-      },
-      {
-        "day": "Fri-Sat",
-        "hours": "8:00 - 23:30"
-      },
-      {
-        "day": "Sun",
-        "hours": "9:00 - 21:00"
-      }
+  contact: {
+    address: "1420 E 6th St, Austin, TX 78702",
+    phone: "(512) 555-TACO",
+    email: "hola@lachispa.com",
+    mapsUrl: "https://maps.google.com/?q=1420+E+6th+St+Austin+TX",
+    hours: [
+      { day: "Mon-Thu", hours: "11:00 AM - 11:00 PM" },
+      { day: "Fri-Sat", hours: "11:00 AM - 2:00 AM" },
+      { day: "Sun", hours: "10:00 AM - 10:00 PM" },
     ],
-    "social": {}
+    social: {
+      instagram: "@lachispaatx",
+    },
   },
   menu: {
-    categories: ["Antojitos","Tacos","Platos","Postres","Bebidas"],
+    categories: ["Tacos", "Antojitos", "Platos Fuertes", "Bebidas", "Postres"],
     items: [
-    {
-      id: "mx-ant-1",
-      name: "Guacamole & totopos",
-      description: "this is boobs",
-      price: "£9",
-      category: "Antojitos",
-      tags: ["Vegetarian","Share"],
-      allergens: ["Sesame","Gluten","Dairy","Eggs"],
-      calories: "320 kcal",
-    },
-    {
-      id: "mx-ant-2",
-      name: "Elote callejero",
-      description: "Charred sweet corn, chipotle mayo, cotija-style cheese, lime, tajín.",
-      price: "£7.50",
-      category: "Antojitos",
-      tags: ["Spicy"],
-      allergens: ["Dairy","Eggs"],
-    },
-    {
-      id: "mx-ant-3",
-      name: "Tostadas de tinga",
-      description: "Crispy tortillas, smoky shredded chicken, black beans, crema, pickled onion.",
-      price: "£11",
-      category: "Antojitos",
-      allergens: ["Dairy"],
-      calories: "410 kcal",
-    },
-    {
-      id: "mx-ant-4",
-      name: "Queso fundido",
-      description: "Baked Chihuahua-style cheese with roasted poblanos, chorizo optional — served with warm tortillas.",
-      price: "£12",
-      category: "Antojitos",
-      tags: ["Chef's pick"],
-      allergens: ["Dairy"],
-    },
-    {
-      id: "mx-ta-1",
-      name: "Tacos al pastor",
-      description: "Marinated pork, pineapple, onion, cilantro, red salsa on double corn tortillas (two).",
-      price: "£10.50",
-      category: "Tacos",
-      tags: ["Signature"],
-      calories: "380 kcal",
-    },
-    {
-      id: "mx-ta-2",
-      name: "Tacos de carnitas",
-      description: "Slow-cooked confit pork, white onion, salsa verde, lime (two).",
-      price: "£10",
-      category: "Tacos",
-    },
-    {
-      id: "mx-ta-3",
-      name: "Tacos de pescado estilo Baja",
-      description: "Beer-battered cod, cabbage slaw, chipotle crema, pico de gallo (two).",
-      price: "£11.50",
-      category: "Tacos",
-      tags: ["Spicy"],
-      allergens: ["Gluten","Fish","Dairy","Eggs"],
-    },
-    {
-      id: "mx-ta-4",
-      name: "Tacos de hongos",
-      description: "Wood-roasted mushrooms, epazote, cashew crema, crispy leeks (two).",
-      price: "£9.50",
-      category: "Tacos",
-      tags: ["Vegan"],
-      allergens: ["Tree nuts"],
-    },
-    {
-      id: "mx-pl-1",
-      name: "Mole poblano",
-      description: "Chicken leg in complex dark mole — twenty ingredients, chocolate warmth, sesame — rice and beans.",
-      price: "£22",
-      category: "Platos",
-      tags: ["Signature","Contains nuts"],
-      allergens: ["Sesame","Tree nuts","Soy"],
-      calories: "720 kcal",
-    },
-    {
-      id: "mx-pl-2",
-      name: "Chile relleno",
-      description: "Roasted poblano stuffed with cheese, tomato caldillo, Mexican red rice.",
-      price: "£18",
-      category: "Platos",
-      allergens: ["Dairy","Eggs","Gluten"],
-    },
-    {
-      id: "mx-pl-3",
-      name: "Enchiladas verdes",
-      description: "Chicken-filled corn tortillas, tomatillo salsa, crema, queso fresco, refried beans.",
-      price: "£17",
-      category: "Platos",
-      allergens: ["Gluten","Dairy"],
-      calories: "640 kcal",
-    },
-    {
-      id: "mx-pl-4",
-      name: "Cochinita pibil",
-      description: "Yucatán-style achiote pork, pickled red onion, habanero salsa on the side, black beans.",
-      price: "£21",
-      category: "Platos",
-      tags: ["Spicy"],
-    },
-    {
-      id: "mx-po-1",
-      name: "Churros con chocolate",
-      description: "Crispy cinnamon-sugar churros, dark Oaxacan chocolate dipping sauce.",
-      price: "£8",
-      category: "Postres",
-      allergens: ["Gluten","Dairy","Eggs"],
-      calories: "480 kcal",
-    },
-    {
-      id: "mx-po-2",
-      name: "Flan de cajeta",
-      description: "Silky caramel custard with goat's milk cajeta and toasted pecans.",
-      price: "£7.50",
-      category: "Postres",
-      allergens: ["Dairy","Eggs","Tree nuts"],
-    },
-    {
-      id: "mx-po-3",
-      name: "Pastel de tres leches",
-      description: "Light sponge soaked in three milks, whipped cream, seasonal berries.",
-      price: "£8.50",
-      category: "Postres",
-      allergens: ["Dairy","Gluten","Eggs"],
-    },
-    {
-      id: "mx-be-1",
-      name: "Agua fresca (daily)",
-      description: "Rotating flavour — tamarind, hibiscus, or cucumber-lime.",
-      price: "£4",
-      category: "Bebidas",
-      tags: ["Non-alcoholic"],
-    },
-    {
-      id: "mx-be-2",
-      name: "Horchata",
-      description: "Cinnamon rice milk, chilled.",
-      price: "£4.50",
-      category: "Bebidas",
-      allergens: ["Tree nuts"],
-    },
-    {
-      id: "mx-be-3",
-      name: "Margarita clásica",
-      description: "Tequila blanco, fresh lime, agave, salted rim.",
-      price: "£11",
-      category: "Bebidas",
-    },
-    {
-      id: "mx-be-4",
-      name: "Mezcal espadín",
-      description: "1oz pour — ask for seasonal cocktail specials.",
-      price: "£9",
-      category: "Bebidas",
-    },
+      {
+        id: "1",
+        name: "Tacos al Pastor",
+        description: "Marinated pork, pineapple, onion, cilantro on fresh corn tortillas",
+        price: "$4.50",
+        category: "Tacos",
+        image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80",
+        tags: ["Signature"],
+      },
+      {
+        id: "2",
+        name: "Carne Asada Tacos",
+        description: "Grilled steak, guacamole, pico de gallo, lime",
+        price: "$5.00",
+        category: "Tacos",
+        image: "https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?w=800&q=80",
+      },
+      {
+        id: "3",
+        name: "Fish Tacos",
+        description: "Beer-battered cod, cabbage slaw, chipotle crema",
+        price: "$5.50",
+        category: "Tacos",
+        image: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800&q=80",
+      },
+      {
+        id: "4",
+        name: "Guacamole Fresco",
+        description: "Made-to-order with fresh avocados, lime, cilantro, jalapeño",
+        price: "$8.00",
+        category: "Antojitos",
+        image: "https://storage.googleapis.com/imagenai-api-public-us-central1/d4b1f2e1-1f2e-4e4f-9f4f-1f2e4e4f9f4f/0.png",
+        tags: ["Vegetarian"],
+      },
+      {
+        id: "5",
+        name: "Elote",
+        description: "Grilled Mexican street corn with cotija, lime, chili powder",
+        price: "$6.00",
+        category: "Antojitos",
+        image: "https://images.unsplash.com/photo-1621336477702-1f0f8e0c2e0e?w=800&q=80",
+      },
+      {
+        id: "6",
+        name: "Nachos Supreme",
+        description: "Loaded with cheese, beans, jalapeños, crema, pico",
+        price: "$12.00",
+        category: "Antojitos",
+        image: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=800&q=80",
+      },
+      {
+        id: "7",
+        name: "Quesadilla",
+        description: "Flour tortilla with melted cheese, choice of protein",
+        price: "$9.00",
+        category: "Antojitos",
+        image: "https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=800&q=80",
+      },
+      {
+        id: "8",
+        name: "Enchiladas Verdes",
+        description: "Chicken enchiladas in tangy tomatillo sauce, crema, queso fresco",
+        price: "$14.00",
+        category: "Platos Fuertes",
+        image: "https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?w=800&q=80",
+      },
+      {
+        id: "9",
+        name: "Fajitas",
+        description: "Sizzling carne asada with peppers, onions, tortillas",
+        price: "$18.00",
+        category: "Platos Fuertes",
+        image: "https://storage.googleapis.com/imagenai-api-public-us-central1/e5c2g3f2-2g3f-5f5g-0g5g-2g3f5f5g0g5g/0.png",
+        tags: ["Chef's Pick"],
+      },
+      {
+        id: "10",
+        name: "Burrito Grande",
+        description: "Massive burrito stuffed with rice, beans, meat, cheese, salsa",
+        price: "$13.00",
+        category: "Platos Fuertes",
+        image: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=800&q=80",
+      },
+      {
+        id: "11",
+        name: "Margarita Clásica",
+        description: "Fresh lime, tequila, triple sec, salt rim",
+        price: "$10.00",
+        category: "Bebidas",
+        image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&q=80",
+        tags: ["Happy Hour"],
+      },
+      {
+        id: "12",
+        name: "Churros",
+        description: "Crispy cinnamon-sugar churros with chocolate dipping sauce",
+        price: "$7.00",
+        category: "Postres",
+        image: "https://storage.googleapis.com/imagenai-api-public-us-central1/f6d3h4g3-3h4g-6g6h-1h6h-3h4g6g6h1h6h/0.png",
+      },
+      {
+        id: "13",
+        name: "Flan",
+        description: "Silky caramel custard dessert",
+        price: "$6.00",
+        category: "Postres",
+        image: "https://images.unsplash.com/photo-1519915028121-7d3463d20b13?w=800&q=80",
+      },
     ],
   },
-  "gallery": [
-    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80",
-    "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80",
-    "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80"
+  gallery: [
+    "https://storage.googleapis.com/imagenai-api-public-us-central1/d4b1f2e1-1f2e-4e4f-9f4f-1f2e4e4f9f4f/0.png",
+    "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80",
+    "https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?w=800&q=80",
+    "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800&q=80",
+    "https://images.unsplash.com/photo-1621336477702-1f0f8e0c2e0e?w=800&q=80",
+    "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=800&q=80",
+    "https://storage.googleapis.com/imagenai-api-public-us-central1/e5c2g3f2-2g3f-5f5g-0g5g-2g3f5f5g0g5g/0.png",
+    "https://storage.googleapis.com/imagenai-api-public-us-central1/f6d3h4g3-3h4g-6g6h-1h6h-3h4g6g6h1h6h/0.png",
   ],
-  "events": [
+  events: [
     {
-      "id": "e1",
-      "title": "Taco night",
-      "date": "Every Thursday",
-      "description": "Fresh tortillas, house salsas, and rotating specials."
-    }
+      id: "1",
+      title: "Taco Tuesday",
+      date: "Every Tuesday",
+      description: "$2 tacos all day, $5 margaritas 5-7pm",
+      image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80",
+    },
+    {
+      id: "2",
+      title: "Mezcal Masterclass",
+      date: "First Friday Monthly",
+      description: "Learn about artisanal mezcal with tastings and cocktails",
+      image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&q=80",
+    },
+    {
+      id: "3",
+      title: "Sunday Brunch Mariachi",
+      date: "Every Sunday 11am-2pm",
+      description: "Live mariachi band, bottomless mimosas, chilaquiles",
+      image: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=800&q=80",
+    },
+    {
+      id: "4",
+      title: "Día de los Muertos",
+      date: "November 1-2",
+      description: "Special menu, altar, face painting, live music",
+      image: "https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?w=800&q=80",
+    },
   ],
-  "modules": {
-    "reservations": {
-      "enabled": true,
-      "partySizeMax": 12,
-      "confirmationEmail": {
-        "enabled": false,
-        "subject": "Your table reservation is confirmed"
-      },
-      "weeklyHours": {
-        "monday": [
-          {
-            "open": "12:00",
-            "close": "14:30"
-          },
-          {
-            "open": "17:00",
-            "close": "22:30"
-          }
-        ],
-        "tuesday": [
-          {
-            "open": "12:00",
-            "close": "14:30"
-          }
-        ],
-        "wednesday": [
-          {
-            "open": "12:00",
-            "close": "14:30"
-          }
-        ],
-        "thursday": [
-          {
-            "open": "12:00",
-            "close": "14:30"
-          }
-        ],
-        "friday": [
-          {
-            "open": "12:00",
-            "close": "14:30"
-          }
-        ],
-        "saturday": [
-          {
-            "open": "12:00",
-            "close": "22:30"
-          }
-        ],
-        "sunday": [
-          {
-            "open": "10:00",
-            "close": "14:30"
-          }
-        ]
-      },
-      "slotIntervalMinutes": 30,
-      "bookingOverrides": [
-        {
-          "date": "2026-04-25",
-          "closedAllDay": true,
-          "closedWindows": []
-        },
-        {
-          "date": "2026-04-26",
-          "closedAllDay": true,
-          "closedWindows": []
-        }
-      ]
+  modules: {
+    reservations: {
+      enabled: true,
+      partySizeMax: 12,
     },
-    "menuCms": {
-      "enabled": true
+    menuCms: {
+      enabled: true,
     },
-    "catering": {
-      "enabled": true
+    catering: {
+      enabled: true,
+      minGuests: 20,
     },
-    "pushCampaigns": {
-      "enabled": true
-    },
-    "customerAccounts": {
-      "enabled": true
-    },
-    "multiLocation": {
-      "enabled": true
-    },
-    "jobs": {
-      "enabled": true
-    },
-    "photoWall": {
-      "enabled": true
-    }
   },
-  "tenant": {
-    "projectId": "wum9HLpvLExj45",
-    "apiBase": "https://mode-millions-ride-boston.trycloudflare.com",
-    "apiKey": "f5c5dab21b54e378078d0210ce8ed82378764dbdb6ab7098c51402cd38cf17f1"
-  }
 };
