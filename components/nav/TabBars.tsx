@@ -1,6 +1,7 @@
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { restaurantConfig } from "../../restaurant.config";
 import { layout, radiusFor, spacing, theme } from "../../theme";
 
 /**
@@ -27,15 +28,23 @@ function labelFor(
 
 /**
  * Expo Router uses `options.href: null` to hide a screen from the tab bar.
- * Those routes stay in `state.routes`; the built-in tab bar filters them, but
- * custom `tabBar` renderers must filter manually (expo/router#546).
+ * Those routes stay in `state.routes`; custom `tabBar` renderers must filter
+ * them (expo/router#546). We also respect `restaurantConfig.layout.tabBarHiddenRoutes`
+ * so the bar matches config even if `(tabs)/_layout.tsx` is stale or missing
+ * per-screen `href` (common when only `restaurant.config.ts` was updated).
  */
 function visibleTabBarRoutes(
   state: BottomTabBarProps["state"],
   descriptors: BottomTabBarProps["descriptors"]
 ) {
-  return state.routes.filter(
-    (route) => descriptors[route.key]?.options?.href !== null
+  type R = (typeof state.routes)[number];
+  const notHiddenByHref = state.routes.filter(
+    (route: R) => descriptors[route.key]?.options?.href !== null
+  );
+  const hiddenByConfig = new Set(restaurantConfig.layout?.tabBarHiddenRoutes ?? []);
+  if (hiddenByConfig.size === 0) return notHiddenByHref;
+  return notHiddenByHref.filter(
+    (route: R) => !hiddenByConfig.has(String(route.name))
   );
 }
 
