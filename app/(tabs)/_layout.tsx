@@ -4,11 +4,8 @@ import { restaurantConfig } from "../../restaurant.config";
 import { layout, theme } from "../../theme";
 
 /**
- * Base-five tabs ship with every app. Additional tabs are registered only
- * when the matching backend module is enabled in `restaurant.config.ts`.
- * Expo Router discovers any file under `app/(tabs)/`, so screens for
- * disabled modules stay on disk but never get a `<Tabs.Screen>` entry —
- * which means the tab bar doesn't show them and the route is unreachable.
+ * Streamlined navigation: core tabs in the bottom pill (Home, Menu, Reserve, Visit),
+ * secondary items (Gallery, Events, Catering) accessible via hamburger menu on home screen.
  */
 export default function TabsLayout() {
   const TabBar = resolveTabBar(layout.nav);
@@ -25,16 +22,9 @@ export default function TabsLayout() {
         headerShadowVisible: false,
       }}
     >
+      {/* Core tabs - always visible in bottom pill */}
       <Tabs.Screen name="index" options={{ title: "Home" }} />
       <Tabs.Screen name="menu" options={{ title: "Menu" }} />
-      <Tabs.Screen name="gallery" options={{ title: "Gallery" }} />
-      <Tabs.Screen name="events" options={{ title: "Events" }} />
-      <Tabs.Screen name="location" options={{ title: "Visit" }} />
-      {/*
-        Module-gated tabs. When a module is disabled we still ship a
-        <Tabs.Screen> entry that hides the route from the tab bar so Expo
-        Router doesn't auto-create a leaky default entry for the same file.
-      */}
       <Tabs.Screen
         name="reserve"
         options={{
@@ -42,13 +32,26 @@ export default function TabsLayout() {
           href: modules.reservations?.enabled ? undefined : null,
         }}
       />
+      <Tabs.Screen name="location" options={{ title: "Visit" }} />
+
+      {/* Secondary screens - hidden from tab bar, accessible via hamburger menu */}
+      <Tabs.Screen
+        name="gallery"
+        options={{ title: "Gallery", href: null }}
+      />
+      <Tabs.Screen
+        name="events"
+        options={{ title: "Events", href: null }}
+      />
       <Tabs.Screen
         name="catering"
         options={{
           title: "Catering",
-          href: modules.catering?.enabled ? undefined : null,
+          href: null, // Always hidden from tabs, accessible via menu
         }}
       />
+
+      {/* Other module-gated tabs */}
       <Tabs.Screen
         name="careers"
         options={{
