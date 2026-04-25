@@ -19,7 +19,7 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
-      {/* Hamburger menu button - top left */}
+      {/* Hamburger menu button - top right */}
       <TouchableOpacity
         onPress={() => setMenuVisible(true)}
         style={styles.hamburger}
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   hamburger: {
     position: "absolute",
     top: 60,
-    left: 20,
+    right: 20,
     zIndex: 100,
     width: 44,
     height: 44,
