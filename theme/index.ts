@@ -242,6 +242,9 @@ export const layout: Required<LayoutConfig> = {
   cornerStyle: layoutConfig.cornerStyle ?? "rounded",
   decor: layoutConfig.decor ?? "dividers",
   mood: layoutConfig.mood ?? "warm",
+  tabBarHiddenRoutes: Array.isArray(layoutConfig.tabBarHiddenRoutes)
+    ? layoutConfig.tabBarHiddenRoutes
+    : [],
 };
 
 export function radiusFor(base: number): number {
