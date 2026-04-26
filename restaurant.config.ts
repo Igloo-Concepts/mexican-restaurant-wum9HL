@@ -244,6 +244,7 @@ export const restaurantConfig: RestaurantConfig = {
     radius: 0,
   },
   layout: {
+    previewWebTopInset: 43,
     nav: "pillTabs",
     hero: "marquee",
     menu: "grid",
