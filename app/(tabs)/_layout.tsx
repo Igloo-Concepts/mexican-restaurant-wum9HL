@@ -1,7 +1,8 @@
 import { Tabs } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { isTopBar, resolveTabBar } from "../../components/nav/TabBars";
 import { restaurantConfig } from "../../restaurant.config";
-import { layout, theme } from "../../theme";
+import { layout } from "../../theme";
 
 /**
  * Base-five tabs ship with every app. Additional tabs are registered only
@@ -12,18 +13,17 @@ import { layout, theme } from "../../theme";
  */
 export default function TabsLayout() {
   const TabBar = resolveTabBar(layout.nav);
-  const tabBarPosition = isTopBar(layout.nav) ? "top" : "bottom";
+  const tabBarIsTop = isTopBar(layout.nav);
+  const tabBarPosition = tabBarIsTop ? "top" : "bottom";
   const modules = restaurantConfig.modules ?? {};
   const tabBarHidden = new Set(layout.tabBarHiddenRoutes);
 
-  return (
+  const tabs = (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
       tabBarPosition={tabBarPosition as any}
       screenOptions={{
-        headerStyle: { backgroundColor: theme.background },
-        headerTitleStyle: { fontWeight: "700", color: theme.text },
-        headerShadowVisible: false,
+        headerShown: false,
       }}
     >
       <Tabs.Screen
@@ -110,5 +110,14 @@ export default function TabsLayout() {
         }}
       />
     </Tabs>
+  );
+
+  // With no stack header, bottom-tab content would draw under the status bar /
+  // Dynamic Island. Top-tab variants already wrap the bar in SafeAreaView.
+  if (tabBarIsTop) return tabs;
+  return (
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      {tabs}
+    </SafeAreaView>
   );
 }
