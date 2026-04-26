@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   hamburger: {
     position: "absolute",
     top: 60,
-    right: 20,
+    left: 20,
     zIndex: 100,
     width: 44,
     height: 44,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   closeButton: {
     position: "absolute",
     top: 60,
-    right: 20,
+    left: 20,
     width: 40,
     height: 40,
     justifyContent: "center",
