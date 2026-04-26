@@ -85,9 +85,9 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   hamburger: {
     position: "absolute",
-    top: 60,
+    top: 12,
     left: 20,
-    zIndex: 100,
+    zIndex: 100000,
     width: 44,
     height: 44,
     borderRadius: 22,
