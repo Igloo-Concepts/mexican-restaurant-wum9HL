@@ -30,7 +30,7 @@ export default function HomeScreen() {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingTop: 56, paddingBottom: spacing.xl }}
+        contentContainerStyle={{ paddingTop: 56, paddingTop: 56, paddingBottom: spacing.xl }}
       >
         <Hero config={restaurantConfig} />
         <View style={{ height: spacing.md }} />
