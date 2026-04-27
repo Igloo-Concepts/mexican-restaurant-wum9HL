@@ -5,8 +5,10 @@ import { useFonts } from "expo-font";
 import { View } from "react-native";
 import { getFontAssetsForPreset } from "../lib/fonts";
 import { layout, theme } from "../theme";
+import { usePushCampaignRegistration } from "../lib/push-campaign-registration";
 
 export default function RootLayout() {
+  usePushCampaignRegistration();
   const [loaded] = useFonts(getFontAssetsForPreset(layout.typography));
 
   // While the active typography preset's font files are loading we paint a
