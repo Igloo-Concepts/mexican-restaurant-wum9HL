@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Text, TextInput, View } from "react-native";
 import { ActionButton } from "../../components/ActionButton";
+import { GlobalHeader } from "../../components/GlobalHeader";
 import { SafeFormScroll } from "../../components/layout/SafeFormScroll";
 import { SectionHeader } from "../../components/SectionHeader";
 import { upsertCustomer, useDeviceId } from "../../lib/platform";
+import { restaurantConfig } from "../../restaurant.config";
 import { radiusFor, spacing, theme, typography } from "../../theme";
 
 /**
@@ -61,35 +63,42 @@ export default function AccountScreen() {
     }
   }
 
+  const topInset = restaurantConfig.layout?.previewWebTopInset ?? 59;
+
   return (
-    <SafeFormScroll>
-      <SectionHeader title="Your profile" />
-      <Text
-        style={{ ...typography.body, color: theme.muted, marginBottom: spacing.md }}
-      >
-        Optional — tell us how you like to dine and we'll remember for next time.
-      </Text>
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+      <View style={{ paddingTop: topInset }}>
+        <GlobalHeader />
+      </View>
+      <SafeFormScroll>
+        <SectionHeader title="Your profile" />
+        <Text
+          style={{ ...typography.body, color: theme.muted, marginBottom: spacing.md }}
+        >
+          Optional — tell us how you like to dine and we'll remember for next time.
+        </Text>
 
-      <Field label="Name" value={name} onChange={setName} />
-      <Field label="Email" value={email} onChange={setEmail} keyboardType="email-address" />
-      <Field label="Phone" value={phone} onChange={setPhone} keyboardType="phone-pad" />
-      <Field
-        label="Dietary prefs (comma-separated)"
-        value={dietary}
-        onChange={setDietary}
-        placeholder="vegetarian, no shellfish"
-      />
-      <Field label="Birthday" value={birthday} onChange={setBirthday} placeholder="YYYY-MM-DD" />
+        <Field label="Name" value={name} onChange={setName} />
+        <Field label="Email" value={email} onChange={setEmail} keyboardType="email-address" />
+        <Field label="Phone" value={phone} onChange={setPhone} keyboardType="phone-pad" />
+        <Field
+          label="Dietary prefs (comma-separated)"
+          value={dietary}
+          onChange={setDietary}
+          placeholder="vegetarian, no shellfish"
+        />
+        <Field label="Birthday" value={birthday} onChange={setBirthday} placeholder="YYYY-MM-DD" />
 
-      {err && <Text style={{ color: "#c0392b", marginBottom: spacing.sm }}>{err}</Text>}
-      {ok && <Text style={{ color: theme.accent, marginBottom: spacing.sm }}>{ok}</Text>}
+        {err && <Text style={{ color: "#c0392b", marginBottom: spacing.sm }}>{err}</Text>}
+        {ok && <Text style={{ color: theme.accent, marginBottom: spacing.sm }}>{ok}</Text>}
 
-      <ActionButton
-        label={saving ? "Saving…" : "Save profile"}
-        onPress={saving ? undefined : save}
-        style={{ marginTop: spacing.md }}
-      />
-    </SafeFormScroll>
+        <ActionButton
+          label={saving ? "Saving…" : "Save profile"}
+          onPress={saving ? undefined : save}
+          style={{ marginTop: spacing.md }}
+        />
+      </SafeFormScroll>
+    </View>
   );
 }
 
