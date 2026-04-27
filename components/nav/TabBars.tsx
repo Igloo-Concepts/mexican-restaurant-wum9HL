@@ -16,7 +16,7 @@ const GLYPHS: Record<string, string> = {
   location: "◉",
   reserve: "◷",
   catering: "◈",
-  account: "👤",
+  account: "●",
 };
 
 function labelFor(
