@@ -36,6 +36,9 @@ export function GlobalHeader() {
   if (modules.catering?.enabled) {
     menuItems.push({ label: "Catering", route: "/catering" });
   }
+  if (modules.customerAccounts?.enabled) {
+    menuItems.push({ label: "Profile", route: "/account" });
+  }
 
   const contactItems = [
     { label: "Call", action: () => Linking.openURL(`tel:${restaurantConfig.contact.phone}`) },
