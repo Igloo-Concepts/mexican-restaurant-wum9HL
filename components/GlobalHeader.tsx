@@ -39,6 +39,9 @@ export function GlobalHeader() {
   if (modules.customerAccounts?.enabled) {
     menuItems.push({ label: "Profile", route: "/account" });
   }
+  if (modules.jobs?.enabled) {
+    menuItems.push({ label: "Join Our Team", route: "/careers" });
+  }
 
   const contactItems = [
     { label: "Call", action: () => Linking.openURL(`tel:${restaurantConfig.contact.phone}`) },
