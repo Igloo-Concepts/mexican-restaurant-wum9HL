@@ -443,5 +443,8 @@ export const restaurantConfig: RestaurantConfig = {
       enabled: true,
       minGuests: 20,
     },
+    pushCampaigns: {
+      enabled: true,
+    },
   },
 };
