@@ -1,8 +1,16 @@
+import { View } from "react-native";
 import { restaurantConfig } from "../../restaurant.config";
 import { resolveGallery } from "../../components/gallery/Galleries";
-import { layout } from "../../theme";
+import { layout, theme } from "../../theme";
+import { GlobalHeader } from "../../components/GlobalHeader";
 
 export default function GalleryScreen() {
   const Gallery = resolveGallery(layout.gallery);
-  return <Gallery config={restaurantConfig} />;
+
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+      <GlobalHeader />
+      <Gallery images={restaurantConfig.gallery} />
+    </View>
+  );
 }
