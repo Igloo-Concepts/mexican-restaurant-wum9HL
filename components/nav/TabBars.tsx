@@ -7,6 +7,7 @@ import { layout, radiusFor, spacing, theme } from "../../theme";
 /**
  * Icon glyphs indexed by route name. We keep these as text glyphs so no icon
  * package is required; any variant can swap them for vector icons later.
+ * Account uses a solid filled person silhouette to match the all-black style.
  */
 const GLYPHS: Record<string, string> = {
   index: "⌂",
@@ -16,7 +17,7 @@ const GLYPHS: Record<string, string> = {
   location: "◉",
   reserve: "◷",
   catering: "◈",
-  account: "●",
+  account: "👤",
 };
 
 function labelFor(
@@ -51,6 +52,18 @@ function visibleTabBarRoutes(
   );
 }
 
+/**
+ * Reorder routes so that 'account' always appears last in the tab bar.
+ */
+function reorderRoutes(
+  routes: BottomTabBarProps["state"]["routes"]
+): BottomTabBarProps["state"]["routes"] {
+  const accountRoute = routes.find((r) => r.name === "account");
+  if (!accountRoute) return routes;
+  const others = routes.filter((r) => r.name !== "account");
+  return [...others, accountRoute] as typeof routes;
+}
+
 function isTabRouteFocused(
   state: BottomTabBarProps["state"],
   route: BottomTabBarProps["state"]["routes"][number]
@@ -62,7 +75,7 @@ function isTabRouteFocused(
 /* Bottom tabs — classic iOS bar with icons + labels. The safe default.       */
 /* -------------------------------------------------------------------------- */
 export function BottomTabs(props: BottomTabBarProps) {
-  const tabRoutes = visibleTabBarRoutes(props.state, props.descriptors);
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: theme.surface }}>
       <View
@@ -108,7 +121,7 @@ export function BottomTabs(props: BottomTabBarProps) {
 /* Pill tabs — floating rounded capsule hovering above the content.           */
 /* -------------------------------------------------------------------------- */
 export function PillTabs(props: BottomTabBarProps) {
-  const tabRoutes = visibleTabBarRoutes(props.state, props.descriptors);
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: "transparent" }}>
       <View
@@ -161,7 +174,7 @@ export function PillTabs(props: BottomTabBarProps) {
 /* Icon-only tabs — flat bar, no labels, oversized icons.                     */
 /* -------------------------------------------------------------------------- */
 export function IconOnlyTabs(props: BottomTabBarProps) {
-  const tabRoutes = visibleTabBarRoutes(props.state, props.descriptors);
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: theme.background }}>
       <View
@@ -215,7 +228,7 @@ export function IconOnlyTabs(props: BottomTabBarProps) {
 /* Minimal top tabs — text-only tabs at the top, scroll underneath.            */
 /* -------------------------------------------------------------------------- */
 export function MinimalTopTabs(props: BottomTabBarProps) {
-  const tabRoutes = visibleTabBarRoutes(props.state, props.descriptors);
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   return (
     <SafeAreaView edges={["top"]} style={{ backgroundColor: theme.background }}>
       <View
@@ -263,7 +276,7 @@ export function MinimalTopTabs(props: BottomTabBarProps) {
 /* Floating dock — centered pill with elevated primary action.                */
 /* -------------------------------------------------------------------------- */
 export function FloatingDock(props: BottomTabBarProps) {
-  const tabRoutes = visibleTabBarRoutes(props.state, props.descriptors);
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: "transparent" }}>
       <View
@@ -315,7 +328,7 @@ export function FloatingDock(props: BottomTabBarProps) {
 /* one tab (reservations, events, specials) to dominate visually.             */
 /* -------------------------------------------------------------------------- */
 export function CenterRaisedTabs(props: BottomTabBarProps) {
-  const tabRoutes = visibleTabBarRoutes(props.state, props.descriptors);
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   const middleIndex = Math.floor(tabRoutes.length / 2);
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: theme.surface }}>
@@ -399,7 +412,7 @@ export function CenterRaisedTabs(props: BottomTabBarProps) {
 /* single enclosed capsule; the active segment gets a filled background.      */
 /* -------------------------------------------------------------------------- */
 export function SegmentedTabs(props: BottomTabBarProps) {
-  const tabRoutes = visibleTabBarRoutes(props.state, props.descriptors);
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   return (
     <SafeAreaView edges={["top"]} style={{ backgroundColor: theme.background }}>
       <View
@@ -461,6 +474,7 @@ export function SegmentedTabs(props: BottomTabBarProps) {
 /* Magazine/editorial feel, comfortable when you have 5+ tabs.                */
 /* -------------------------------------------------------------------------- */
 export function UnderlineTopTabs(props: BottomTabBarProps) {
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   return (
     <SafeAreaView edges={["top"]} style={{ backgroundColor: theme.background }}>
       <ScrollView
@@ -477,7 +491,7 @@ export function UnderlineTopTabs(props: BottomTabBarProps) {
           borderBottomColor: theme.muted + "22",
         }}
       >
-        {visibleTabBarRoutes(props.state, props.descriptors).map((route) => {
+        {tabRoutes.map((route) => {
           const focused = isTabRouteFocused(props.state, route);
           return (
             <Pressable
@@ -520,7 +534,7 @@ export function UnderlineTopTabs(props: BottomTabBarProps) {
 /* accent line on the top edge (web-app pattern). Bold, structured, distinct. */
 /* -------------------------------------------------------------------------- */
 export function IndicatorBarTabs(props: BottomTabBarProps) {
-  const tabRoutes = visibleTabBarRoutes(props.state, props.descriptors);
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: theme.surface }}>
       <View
@@ -583,7 +597,7 @@ export function IndicatorBarTabs(props: BottomTabBarProps) {
 /* tinted rounded square behind its icon. Warm/boutique feel.                 */
 /* -------------------------------------------------------------------------- */
 export function CurvedBottomTabs(props: BottomTabBarProps) {
-  const tabRoutes = visibleTabBarRoutes(props.state, props.descriptors);
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: theme.background }}>
       <View
@@ -658,7 +672,7 @@ export function CurvedBottomTabs(props: BottomTabBarProps) {
 /* detached from the edges like FloatingDock, but legible at a glance.        */
 /* -------------------------------------------------------------------------- */
 export function LabeledDockTabs(props: BottomTabBarProps) {
-  const tabRoutes = visibleTabBarRoutes(props.state, props.descriptors);
+  const tabRoutes = reorderRoutes(visibleTabBarRoutes(props.state, props.descriptors));
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: "transparent" }}>
       <View
