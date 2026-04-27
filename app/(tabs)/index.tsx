@@ -30,7 +30,7 @@ export default function HomeScreen() {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: spacing.xl }}
+        contentContainerStyle={{ paddingTop: 56, paddingBottom: spacing.xl }}
       >
         <Hero config={restaurantConfig} />
         <View style={{ height: spacing.md }} />
@@ -85,7 +85,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   hamburger: {
     position: "absolute",
-    top: 12,
+    top: 8,
     left: 20,
     zIndex: 100000,
     width: 44,
