@@ -446,5 +446,35 @@ export const restaurantConfig: RestaurantConfig = {
     pushCampaigns: {
       enabled: true,
     },
+    multiLocation: {
+      enabled: true,
+      locations: [
+        {
+          id: "1",
+          name: "La Chispa East 6th",
+          address: "1420 E 6th St, Austin, TX 78702",
+          phone: "(512) 555-TACO",
+          mapsUrl: "https://maps.google.com/?q=1420+E+6th+St+Austin+TX",
+          hours: [
+            { day: "Mon-Thu", hours: "11:00 AM - 11:00 PM" },
+            { day: "Fri-Sat", hours: "11:00 AM - 2:00 AM" },
+            { day: "Sun", hours: "10:00 AM - 10:00 PM" },
+          ],
+          primary: true,
+        },
+        {
+          id: "2",
+          name: "La Chispa South Congress",
+          address: "1618 S Congress Ave, Austin, TX 78704",
+          phone: "(512) 555-SOCO",
+          mapsUrl: "https://maps.google.com/?q=1618+S+Congress+Ave+Austin+TX",
+          hours: [
+            { day: "Mon-Thu", hours: "11:00 AM - 10:00 PM" },
+            { day: "Fri-Sat", hours: "11:00 AM - 12:00 AM" },
+            { day: "Sun", hours: "10:00 AM - 9:00 PM" },
+          ],
+        },
+      ],
+    },
   },
 };
