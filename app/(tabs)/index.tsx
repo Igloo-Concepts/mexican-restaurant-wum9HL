@@ -19,7 +19,7 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
-      {/* Hamburger menu button - top right */}
+      {/* Hamburger menu button - top left */}
       <TouchableOpacity
         onPress={() => setMenuVisible(true)}
         style={styles.hamburger}
@@ -30,7 +30,7 @@ export default function HomeScreen() {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingTop: 56, paddingTop: 56, paddingTop: 56, paddingTop: 56, paddingBottom: spacing.xl }}
+        contentContainerStyle={{ paddingTop: 56, paddingBottom: spacing.xl }}
       >
         <Hero config={restaurantConfig} />
         <View style={{ height: spacing.md }} />
@@ -49,6 +49,7 @@ export default function HomeScreen() {
           onPress={() => setMenuVisible(false)}
         >
           <View style={[styles.menuPanel, { backgroundColor: theme.surface }]}>
+            {/* Close button - positioned at top */}
             <TouchableOpacity
               onPress={() => setMenuVisible(false)}
               style={styles.closeButton}
@@ -56,6 +57,7 @@ export default function HomeScreen() {
               <Text style={[styles.closeIcon, { color: theme.text }]}>✕</Text>
             </TouchableOpacity>
 
+            {/* Menu title with extra top margin to clear close button */}
             <Text style={[styles.menuTitle, typography.heading, { color: theme.primary }]}>
               MORE
             </Text>
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
   menuPanel: {
     width: 280,
     height: "100%",
-    paddingTop: 80,
+    paddingTop: 120,
     paddingHorizontal: 24,
     shadowColor: "#000",
     shadowOffset: { width: 2, height: 0 },
@@ -117,7 +119,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: "absolute",
-    top: 60,
+    top: 16,
     left: 20,
     width: 40,
     height: 40,
