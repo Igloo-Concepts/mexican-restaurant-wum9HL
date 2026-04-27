@@ -11,6 +11,7 @@ import { restaurantConfig } from "../../restaurant.config";
 import { ActionButton } from "../../components/ActionButton";
 import { SectionHeader } from "../../components/SectionHeader";
 import { SafeFormScroll } from "../../components/layout/SafeFormScroll";
+import { GlobalHeader } from "../../components/GlobalHeader";
 import {
   getTenantConfig,
   submitReservation,
@@ -223,109 +224,112 @@ export default function ReserveScreen() {
   }
 
   return (
-    <SafeFormScroll>
-      <SectionHeader title="Reserve a table" />
-      <Text
-        style={{
-          ...typography.body,
-          color: theme.muted,
-          marginBottom: spacing.md,
-        }}
-      >
-        Tell us when you'd like to visit. We'll confirm by phone or email.
-      </Text>
-      {hoursError && getTenantConfig() ? (
-        <View style={{ marginBottom: spacing.sm }}>
-          <Text style={{ ...typography.caption, color: "#c0392b" }}>
-            Could not load opening hours from the server ({hoursError.code}).
-            Times below use any copy baked into the app, or tap Retry.
-          </Text>
-          <Pressable
-            onPress={() => refreshHours()}
-            style={{
-              marginTop: spacing.xs,
-              alignSelf: "flex-start",
-              paddingVertical: spacing.xs,
-              paddingHorizontal: spacing.md,
-              borderRadius: radiusFor(theme.radius),
-              borderWidth: 1,
-              borderColor: theme.muted,
-            }}
-          >
-            <Text style={{ ...typography.caption, color: theme.accent }}>
-              Retry
-            </Text>
-          </Pressable>
-        </View>
-      ) : null}
-      {!hoursLoading && hoursConfigured ? (
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+      <GlobalHeader />
+      <SafeFormScroll>
+        <SectionHeader title="Reserve a table" />
         <Text
           style={{
-            ...typography.caption,
+            ...typography.body,
             color: theme.muted,
-            marginBottom: spacing.sm,
+            marginBottom: spacing.md,
           }}
         >
-          Only times inside the restaurant's sessions are shown.
+          Tell us when you'd like to visit. We'll confirm by phone or email.
         </Text>
-      ) : null}
+        {hoursError && getTenantConfig() ? (
+          <View style={{ marginBottom: spacing.sm }}>
+            <Text style={{ ...typography.caption, color: "#c0392b" }}>
+              Could not load opening hours from the server ({hoursError.code}).
+              Times below use any copy baked into the app, or tap Retry.
+            </Text>
+            <Pressable
+              onPress={() => refreshHours()}
+              style={{
+                marginTop: spacing.xs,
+                alignSelf: "flex-start",
+                paddingVertical: spacing.xs,
+                paddingHorizontal: spacing.md,
+                borderRadius: radiusFor(theme.radius),
+                borderWidth: 1,
+                borderColor: theme.muted,
+              }}
+            >
+              <Text style={{ ...typography.caption, color: theme.accent }}>
+                Retry
+              </Text>
+            </Pressable>
+          </View>
+        ) : null}
+        {!hoursLoading && hoursConfigured ? (
+          <Text
+            style={{
+              ...typography.caption,
+              color: theme.muted,
+              marginBottom: spacing.sm,
+            }}
+          >
+            Only times inside the restaurant's sessions are shown.
+          </Text>
+        ) : null}
 
-      <Field label="Your name" value={name} onChange={setName} placeholder="Full name" />
-      <Field
-        label={`Party size (up to ${maxParty})`}
-        value={partySize}
-        onChange={setPartySize}
-        placeholder="2"
-        keyboardType="number-pad"
-      />
-
-      {hoursLoading ? (
-        <NoticeBox>
-          Loading the restaurant's booking windows…
-        </NoticeBox>
-      ) : hoursConfigured ? (
-        <OpeningHoursInlinePicker
-          weeklyHours={weeklyHoursMerged}
-          stepMinutes={slotIntervalMinutes}
-          bookingOverrides={bookingOverrides}
-          value={requestedAt}
-          onSelect={(slot) => setRequestedAt(slot)}
+        <Field label="Your name" value={name} onChange={setName} placeholder="Full name" />
+        <Field
+          label={`Party size (up to ${maxParty})`}
+          value={partySize}
+          onChange={setPartySize}
+          placeholder="2"
+          keyboardType="number-pad"
         />
-      ) : (
-        <NoticeBox>
-          No bookable times have been set yet. Please check back soon or
-          contact the restaurant directly.
-        </NoticeBox>
-      )}
 
-      <Field
-        label="Phone (optional)"
-        value={phone}
-        onChange={setPhone}
-        placeholder="+44 …"
-        keyboardType="phone-pad"
-      />
-      <Field
-        label="Notes (optional)"
-        value={notes}
-        onChange={setNotes}
-        placeholder="Anniversary, dietary needs, etc."
-        multiline
-      />
+        {hoursLoading ? (
+          <NoticeBox>
+            Loading the restaurant's booking windows…
+          </NoticeBox>
+        ) : hoursConfigured ? (
+          <OpeningHoursInlinePicker
+            weeklyHours={weeklyHoursMerged}
+            stepMinutes={slotIntervalMinutes}
+            bookingOverrides={bookingOverrides}
+            value={requestedAt}
+            onSelect={(slot) => setRequestedAt(slot)}
+          />
+        ) : (
+          <NoticeBox>
+            No bookable times have been set yet. Please check back soon or
+            contact the restaurant directly.
+          </NoticeBox>
+        )}
 
-      {error && (
-        <Text style={{ color: "#c0392b", marginBottom: spacing.sm }}>{error}</Text>
-      )}
-      {message && (
-        <Text style={{ color: theme.accent, marginBottom: spacing.sm }}>{message}</Text>
-      )}
+        <Field
+          label="Phone (optional)"
+          value={phone}
+          onChange={setPhone}
+          placeholder="+44 …"
+          keyboardType="phone-pad"
+        />
+        <Field
+          label="Notes (optional)"
+          value={notes}
+          onChange={setNotes}
+          placeholder="Anniversary, dietary needs, etc."
+          multiline
+        />
 
-      <ActionButton
-        label={submitting ? "Sending…" : "Request table"}
-        onPress={submitting ? undefined : send}
-        style={{ marginTop: spacing.md }}
-      />
-    </SafeFormScroll>
+        {error && (
+          <Text style={{ color: "#c0392b", marginBottom: spacing.sm }}>{error}</Text>
+        )}
+        {message && (
+          <Text style={{ color: theme.accent, marginBottom: spacing.sm }}>{message}</Text>
+        )}
+
+        <ActionButton
+          label={submitting ? "Sending…" : "Request table"}
+          onPress={submitting ? undefined : send}
+          style={{ marginTop: spacing.md }}
+        />
+      </SafeFormScroll>
+    </View>
   );
 }
 

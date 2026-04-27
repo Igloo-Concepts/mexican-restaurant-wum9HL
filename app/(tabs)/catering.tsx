@@ -4,6 +4,7 @@ import { restaurantConfig } from "../../restaurant.config";
 import { ActionButton } from "../../components/ActionButton";
 import { SafeFormScroll } from "../../components/layout/SafeFormScroll";
 import { SectionHeader } from "../../components/SectionHeader";
+import { GlobalHeader } from "../../components/GlobalHeader";
 import { submitLead } from "../../lib/platform";
 import { radiusFor, spacing, theme, typography } from "../../theme";
 
@@ -63,42 +64,45 @@ export default function CateringScreen() {
   }
 
   return (
-    <SafeFormScroll>
-      <SectionHeader title="Catering & private dining" />
-      <Text
-        style={{
-          ...typography.body,
-          color: theme.muted,
-          marginBottom: spacing.md,
-        }}
-      >
-        Events from {minGuests} guests upwards. Tell us a little about what
-        you're planning and we'll send over options.
-      </Text>
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+      <GlobalHeader />
+      <SafeFormScroll>
+        <SectionHeader title="Catering & private dining" />
+        <Text
+          style={{
+            ...typography.body,
+            color: theme.muted,
+            marginBottom: spacing.md,
+          }}
+        >
+          Events from {minGuests} guests upwards. Tell us a little about what
+          you're planning and we'll send over options.
+        </Text>
 
-      <Field label="Your name" value={name} onChange={setName} />
-      <Field label="Email" value={email} onChange={setEmail} keyboardType="email-address" />
-      <Field label="Phone" value={phone} onChange={setPhone} keyboardType="phone-pad" />
-      <Field label="Event date" value={eventDate} onChange={setEventDate} placeholder="2026-09-12" />
-      <Field label="Guest count" value={guests} onChange={setGuests} keyboardType="number-pad" />
-      <Field label="Approx. budget" value={budget} onChange={setBudget} placeholder="£2,500" />
-      <Field
-        label="Tell us about your event"
-        value={message}
-        onChange={setMessage}
-        multiline
-        placeholder="Format, dietary needs, venue, timings…"
-      />
+        <Field label="Your name" value={name} onChange={setName} />
+        <Field label="Email" value={email} onChange={setEmail} keyboardType="email-address" />
+        <Field label="Phone" value={phone} onChange={setPhone} keyboardType="phone-pad" />
+        <Field label="Event date" value={eventDate} onChange={setEventDate} placeholder="2026-09-12" />
+        <Field label="Guest count" value={guests} onChange={setGuests} keyboardType="number-pad" />
+        <Field label="Approx. budget" value={budget} onChange={setBudget} placeholder="£2,500" />
+        <Field
+          label="Tell us about your event"
+          value={message}
+          onChange={setMessage}
+          multiline
+          placeholder="Format, dietary needs, venue, timings…"
+        />
 
-      {error && <Text style={{ color: "#c0392b", marginBottom: spacing.sm }}>{error}</Text>}
-      {ok && <Text style={{ color: theme.accent, marginBottom: spacing.sm }}>{ok}</Text>}
+        {error && <Text style={{ color: "#c0392b", marginBottom: spacing.sm }}>{error}</Text>}
+        {ok && <Text style={{ color: theme.accent, marginBottom: spacing.sm }}>{ok}</Text>}
 
-      <ActionButton
-        label={submitting ? "Sending…" : "Send enquiry"}
-        onPress={submitting ? undefined : send}
-        style={{ marginTop: spacing.md }}
-      />
-    </SafeFormScroll>
+        <ActionButton
+          label={submitting ? "Sending…" : "Send enquiry"}
+          onPress={submitting ? undefined : send}
+          style={{ marginTop: spacing.md }}
+        />
+      </SafeFormScroll>
+    </View>
   );
 }
 

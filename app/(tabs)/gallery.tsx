@@ -10,7 +10,7 @@ export default function GalleryScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
       <GlobalHeader />
-      <Gallery images={restaurantConfig.gallery} />
+      <Gallery config={restaurantConfig} />
     </View>
   );
 }

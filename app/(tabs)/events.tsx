@@ -10,7 +10,7 @@ export default function EventsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.background }}>
       <GlobalHeader />
-      <Events events={restaurantConfig.events} />
+      <Events config={restaurantConfig} />
     </View>
   );
 }
