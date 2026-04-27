@@ -256,7 +256,7 @@ export const restaurantConfig: RestaurantConfig = {
     cornerStyle: "sharp",
     decor: "underline",
     mood: "bright",
-    tabBarHiddenRoutes: ["gallery", "events", "catering"],
+    tabBarHiddenRoutes: ["gallery", "events", "catering", "careers"],
   },
   hero: {
     image: "https://storage.googleapis.com/imagenai-api-public-us-central1/c3a0e1e0-0e1f-4f3f-8f3f-0e1f4f3f8f3f/0.png",
@@ -475,6 +475,9 @@ export const restaurantConfig: RestaurantConfig = {
           ],
         },
       ],
+    },
+    jobs: {
+      enabled: true,
     },
   },
 };

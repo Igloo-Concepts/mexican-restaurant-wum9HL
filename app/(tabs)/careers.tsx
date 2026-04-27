@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { restaurantConfig } from "../../restaurant.config";
 import { ActionButton } from "../../components/ActionButton";
+import { GlobalHeader } from "../../components/GlobalHeader";
 import { SafeFormScroll } from "../../components/layout/SafeFormScroll";
 import { SectionHeader } from "../../components/SectionHeader";
 import { submitLead } from "../../lib/platform";
@@ -62,70 +63,77 @@ export default function CareersScreen() {
     }
   }
 
-  return (
-    <SafeFormScroll>
-      <SectionHeader title="Join our team" />
-      <Text
-        style={{ ...typography.body, color: theme.muted, marginBottom: spacing.md }}
-      >
-        Pick the role you're applying for and tell us a little about yourself.
-      </Text>
+  const topInset = restaurantConfig.layout?.previewWebTopInset ?? 59;
 
-      <View
-        style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          gap: spacing.sm,
-          marginBottom: spacing.md,
-        }}
-      >
-        {roles.map((r) => (
-          <Pressable
-            key={r}
-            onPress={() => setRole(r)}
-            style={{
-              borderRadius: radiusFor(theme.radius),
-              borderWidth: 1,
-              borderColor: role === r ? theme.accent : theme.muted,
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.sm,
-              backgroundColor: role === r ? theme.accent : "transparent",
-            }}
-          >
-            <Text
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+      <View style={{ paddingTop: topInset }}>
+        <GlobalHeader />
+      </View>
+      <SafeFormScroll>
+        <SectionHeader title="Join our team" />
+        <Text
+          style={{ ...typography.body, color: theme.muted, marginBottom: spacing.md }}
+        >
+          Pick the role you're applying for and tell us a little about yourself.
+        </Text>
+
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: spacing.sm,
+            marginBottom: spacing.md,
+          }}
+        >
+          {roles.map((r) => (
+            <Pressable
+              key={r}
+              onPress={() => setRole(r)}
               style={{
-                ...typography.caption,
-                color: role === r ? "#fff" : theme.text,
-                fontWeight: "600",
+                borderRadius: radiusFor(theme.radius),
+                borderWidth: 1,
+                borderColor: role === r ? theme.accent : theme.muted,
+                paddingHorizontal: spacing.md,
+                paddingVertical: spacing.sm,
+                backgroundColor: role === r ? theme.accent : "transparent",
               }}
             >
-              {r}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+              <Text
+                style={{
+                  ...typography.caption,
+                  color: role === r ? "#fff" : theme.text,
+                  fontWeight: "600",
+                }}
+              >
+                {r}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
 
-      <Field label="Your name" value={name} onChange={setName} />
-      <Field label="Email" value={email} onChange={setEmail} keyboardType="email-address" />
-      <Field label="Phone" value={phone} onChange={setPhone} keyboardType="phone-pad" />
-      <Field label="Availability" value={availability} onChange={setAvailability} placeholder="Full-time from June" />
-      <Field label="CV link (Drive / website)" value={cvUrl} onChange={setCvUrl} placeholder="https://…" />
-      <Field
-        label="Why you'd be a great fit"
-        value={message}
-        onChange={setMessage}
-        multiline
-      />
+        <Field label="Your name" value={name} onChange={setName} />
+        <Field label="Email" value={email} onChange={setEmail} keyboardType="email-address" />
+        <Field label="Phone" value={phone} onChange={setPhone} keyboardType="phone-pad" />
+        <Field label="Availability" value={availability} onChange={setAvailability} placeholder="Full-time from June" />
+        <Field label="CV link (Drive / website)" value={cvUrl} onChange={setCvUrl} placeholder="https://…" />
+        <Field
+          label="Why you'd be a great fit"
+          value={message}
+          onChange={setMessage}
+          multiline
+        />
 
-      {err && <Text style={{ color: "#c0392b", marginBottom: spacing.sm }}>{err}</Text>}
-      {ok && <Text style={{ color: theme.accent, marginBottom: spacing.sm }}>{ok}</Text>}
+        {err && <Text style={{ color: "#c0392b", marginBottom: spacing.sm }}>{err}</Text>}
+        {ok && <Text style={{ color: theme.accent, marginBottom: spacing.sm }}>{ok}</Text>}
 
-      <ActionButton
-        label={submitting ? "Sending…" : "Apply now"}
-        onPress={submitting ? undefined : send}
-        style={{ marginTop: spacing.md }}
-      />
-    </SafeFormScroll>
+        <ActionButton
+          label={submitting ? "Sending…" : "Apply now"}
+          onPress={submitting ? undefined : send}
+          style={{ marginTop: spacing.md }}
+        />
+      </SafeFormScroll>
+    </View>
   );
 }
 
