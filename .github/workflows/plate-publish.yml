@@ -27,6 +27,24 @@ jobs:
       - name: Checkout app repo
         uses: actions/checkout@v4
 
+      - name: Resolve Expo token
+        shell: bash
+        env:
+          PAYLOAD_EXPO_TOKEN: ${{ fromJson(inputs.plate_payload_json).expoToken }}
+          SECRET_EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          token="${PAYLOAD_EXPO_TOKEN:-}"
+          if [ -z "$token" ]; then
+            token="${SECRET_EXPO_TOKEN:-}"
+          fi
+          if [ -z "$token" ]; then
+            echo "Missing Expo token. Provide expoToken in runner payload or set EXPO_TOKEN repo secret."
+            exit 1
+          fi
+          echo "::add-mask::$token"
+          echo "EXPO_TOKEN=$token" >> "$GITHUB_ENV"
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -37,10 +55,10 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ env.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Build (iOS)
         if: ${{ inputs.plate_action == 'build' }}
@@ -51,4 +69,3 @@ jobs:
         if: ${{ inputs.plate_action == 'submission' }}
         run: |
           npx eas-cli submit --platform ios --non-interactive --latest --json
-
