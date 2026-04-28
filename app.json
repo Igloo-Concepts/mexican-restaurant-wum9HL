@@ -14,14 +14,12 @@
     },
     "ios": {
       "supportsTablet": true,
-<<<<<<< HEAD
       "bundleIdentifier": "app.iglooplate.mexican",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
-=======
       "bundleIdentifier": "app.iglooplate.mexican"
->>>>>>> 2bc175a1ba45924d97d093ef140a479cafe7baa7
+ 2bc175a1ba45924d97d093ef140a479cafe7baa7
     },
     "android": {
       "adaptiveIcon": {
