@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.example.restaurantapp"
+      "bundleIdentifier": "iapp.iglooplate.mexican"
     },
     "android": {
       "adaptiveIcon": {
