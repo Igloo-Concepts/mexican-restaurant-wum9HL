@@ -1,21 +1,20 @@
 {
   "cli": {
-    "version": ">= 16.32.0",
+    "version": ">= 18.0.0",
     "appVersionSource": "remote"
   },
   "build": {
     "development": {
-      "extends": "production",
       "developmentClient": true,
       "distribution": "internal"
     },
     "preview": {
-      "extends": "production",
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
     },
     "production": {
-      "node": "20.19.4",
-      "npm": "10.9.2",
       "autoIncrement": true
     }
   },
