@@ -1,19 +1,22 @@
 {
   "cli": {
-    "version": ">= 16.0.0"
+    "version": ">= 16.32.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
+      "extends": "production",
       "developmentClient": true,
-      "distribution": "internal",
-      "installCommand": "npm install --include=dev --no-audit --no-fund"
+      "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "installCommand": "npm install --include=dev --no-audit --no-fund"
+      "extends": "production",
+      "distribution": "internal"
     },
     "production": {
-      "installCommand": "npm install --include=dev --no-audit --no-fund"
+      "node": "20.19.0",
+      "npm": "10.9.2",
+      "autoIncrement": true
     }
   },
   "submit": {
