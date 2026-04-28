@@ -12,15 +12,14 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "app.iglooplate.mexican",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
-      "bundleIdentifier": "app.iglooplate.mexican"
- 2bc175a1ba45924d97d093ef140a479cafe7baa7
-    },
+
+	"ios": {
+  "supportsTablet": true,
+  "bundleIdentifier": "app.iglooplate.mexican",
+  "infoPlist": {
+    "ITSAppUsesNonExemptEncryption": false
+  }
+},
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
