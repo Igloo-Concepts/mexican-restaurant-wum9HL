@@ -57,7 +57,7 @@ jobs:
           token: ${{ env.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Build (iOS)
         if: ${{ inputs.plate_action == 'build' }}
