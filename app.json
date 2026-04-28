@@ -14,17 +14,21 @@
     },
     "ios": {
       "supportsTablet": true,
+<<<<<<< HEAD
       "bundleIdentifier": "com.example.restaurantapp",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
+=======
+      "bundleIdentifier": "app.iglooplate.mexican"
+>>>>>>> 2bc175a1ba45924d97d093ef140a479cafe7baa7
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.example.restaurantapp"
+      "package": "app.iglooplate.mexican"
     },
     "web": {
       "bundler": "metro"
