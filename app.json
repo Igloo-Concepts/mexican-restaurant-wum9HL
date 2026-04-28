@@ -12,14 +12,13 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-
-	"ios": {
-  "supportsTablet": true,
-  "bundleIdentifier": "app.iglooplate.mexican",
-  "infoPlist": {
-    "ITSAppUsesNonExemptEncryption": false
-  }
-},
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.iglooplate.mexican",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
@@ -32,7 +31,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-notifications"
+      "expo-notifications",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true
