@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
 <<<<<<< HEAD
-      "bundleIdentifier": "com.example.restaurantapp",
+      "bundleIdentifier": "app.iglooplate.mexican",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
