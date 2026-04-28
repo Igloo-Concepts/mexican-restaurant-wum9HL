@@ -1,0 +1,54 @@
+name: Plate Publish Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      plate_action:
+        description: "build or submission"
+        required: true
+        type: string
+      plate_project_id:
+        description: "Plate project id"
+        required: true
+        type: string
+      plate_run_id:
+        description: "Plate run id"
+        required: true
+        type: string
+      plate_payload_json:
+        description: "Raw payload from runner"
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout app repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Setup Expo/EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (iOS)
+        if: ${{ inputs.plate_action == 'build' }}
+        run: |
+          npx eas-cli build --platform ios --non-interactive --no-wait --json
+
+      - name: Submit (iOS)
+        if: ${{ inputs.plate_action == 'submission' }}
+        run: |
+          npx eas-cli submit --platform ios --non-interactive --latest --json
+
