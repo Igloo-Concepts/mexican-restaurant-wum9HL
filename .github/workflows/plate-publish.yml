@@ -49,6 +49,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm"
 
       - name: Setup Expo/EAS
         uses: expo/expo-github-action@v8
@@ -73,6 +74,11 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "chore(ci): drop lockfiles before EAS upload" --no-verify
           fi
+
+      # Install dependencies so Expo config can resolve plugins (expo-router, etc.)
+      # This is required for eas-cli to read app.json/app.config.js properly.
+      - name: Install dependencies
+        run: npm install
 
       - name: Build (iOS)
         if: ${{ inputs.plate_action == 'build' }}
